@@ -1,0 +1,72 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-convex:
+    name: Deploy Convex functions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Deploy to Convex
+        if: ${{ secrets.CONVEX_DEPLOY_KEY != '' }}
+        env:
+          # A deployment key from the Convex dashboard (Settings → Keys).
+          # Add it as a repository secret named CONVEX_DEPLOY_KEY.
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+        run: npx convex deploy --message "GitHub Actions deploy of ${{ github.sha }}"
+
+      - name: Skip Convex deploy (no CONVEX_DEPLOY_KEY secret)
+        if: ${{ secrets.CONVEX_DEPLOY_KEY == '' }}
+        run: echo "::notice::Skipping Convex deploy — add a CONVEX_DEPLOY_KEY repository secret to enable it."
+
+  build-site:
+    name: Build production site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: dist/
+          if-no-files-found: error
