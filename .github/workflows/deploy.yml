@@ -13,6 +13,11 @@ jobs:
     name: Deploy Convex functions
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # A deployment key from the Convex dashboard (Settings → Keys).
+      # Add it as a repository secret named CONVEX_DEPLOY_KEY. Mapped to a
+      # job env var because secrets can't be referenced in `if:` conditions.
+      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -33,15 +38,11 @@ jobs:
         run: npm test
 
       - name: Deploy to Convex
-        if: ${{ secrets.CONVEX_DEPLOY_KEY != '' }}
-        env:
-          # A deployment key from the Convex dashboard (Settings → Keys).
-          # Add it as a repository secret named CONVEX_DEPLOY_KEY.
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+        if: env.CONVEX_DEPLOY_KEY != ''
         run: npx convex deploy --message "GitHub Actions deploy of ${{ github.sha }}"
 
       - name: Skip Convex deploy (no CONVEX_DEPLOY_KEY secret)
-        if: ${{ secrets.CONVEX_DEPLOY_KEY == '' }}
+        if: env.CONVEX_DEPLOY_KEY == ''
         run: echo "::notice::Skipping Convex deploy — add a CONVEX_DEPLOY_KEY repository secret to enable it."
 
   build-site:
