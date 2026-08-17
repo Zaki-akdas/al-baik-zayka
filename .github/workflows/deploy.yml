@@ -66,7 +66,7 @@ jobs:
         run: npm run build
 
       - name: Upload site artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: site-dist
           path: dist/
