@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
     branches: [main]
+  pull_request:
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -14,10 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      # A deployment key from the Convex dashboard (Settings → Keys).
-      # Add it as a repository secret named CONVEX_DEPLOY_KEY. Mapped to a
-      # job env var because secrets can't be referenced in `if:` conditions.
+      # Deployment keys from the Convex dashboard (Settings → Keys). Mapped to
+      # job env vars because secrets can't be referenced in `if:` conditions.
+      # Production deploys on pushes to main; preview deploys on pull requests.
       CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+      CONVEX_PREVIEW_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -37,13 +39,26 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Deploy to Convex
-        if: env.CONVEX_DEPLOY_KEY != ''
-        run: npx convex deploy --message "GitHub Actions deploy of ${{ github.sha }}"
+      - name: Deploy to Convex production
+        if: github.event_name == 'push' && env.CONVEX_DEPLOY_KEY != ''
+        run: npx convex deploy --message "Production deploy of ${{ github.sha }}"
 
-      - name: Skip Convex deploy (no CONVEX_DEPLOY_KEY secret)
-        if: env.CONVEX_DEPLOY_KEY == ''
-        run: echo "::notice::Skipping Convex deploy — add a CONVEX_DEPLOY_KEY repository secret to enable it."
+      - name: Deploy to Convex preview (pull request)
+        if: github.event_name == 'pull_request' && env.CONVEX_PREVIEW_DEPLOY_KEY != ''
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
+        run: |
+          npx convex deploy \
+            --preview-name "${{ github.head_ref }}" \
+            --preview-run products:ensureSeeded \
+            --message "Preview deploy of ${{ github.sha }}"
+
+      - name: Skip Convex deploys (no deploy key secrets)
+        if: >
+          (github.event_name == 'push' && env.CONVEX_DEPLOY_KEY == '') ||
+          (github.event_name == 'pull_request' && env.CONVEX_PREVIEW_DEPLOY_KEY == '')
+        run: |
+          echo "::notice::Convex deploy skipped — add CONVEX_DEPLOY_KEY (production) and CONVEX_PREVIEW_DEPLOY_KEY (preview) repository secrets to enable it."
 
   build-site:
     name: Build production site
