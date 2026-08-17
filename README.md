@@ -1,5 +1,7 @@
 ## Al-Baik Zayka 🍔
 
+[![CI](https://github.com/Zaki-akdas/al-baik-zayka/actions/workflows/ci.yml/badge.svg)](https://github.com/Zaki-akdas/al-baik-zayka/actions/workflows/ci.yml)
+
 A premium, mobile-first website for **Al-Baik Zayka** — a local fast-food
 restaurant (Instagram: [@albaik_zayka](https://www.instagram.com/albaik_zayka/)).
 
