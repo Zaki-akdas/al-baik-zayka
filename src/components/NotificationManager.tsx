@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useQuery } from "convex/react";
 
 import { api } from "@/convex/_generated/api";
-import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 
 /**
@@ -11,11 +10,7 @@ import { useNotifications } from "@/hooks/use-notifications";
  * once so every page benefits.
  */
 export function NotificationManager() {
-  const { isAuthenticated } = useAuth();
-  const orders = useQuery(
-    api.orders.myOrders,
-    isAuthenticated ? {} : "skip",
-  );
+  const orders = useQuery(api.orders.myOrders);
   const { checkOrderStatusChange, lastStatusRef, permission } =
     useNotifications();
 
