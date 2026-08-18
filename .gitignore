@@ -35,8 +35,9 @@ lerna-debug.log*
 *.sw?
 .convex-local/
 
-# Vercel
-.vercel/
+# Vercel (project.json holds non-secret org/project IDs needed by CI)
+.vercel/*
+!.vercel/project.json
 
 # Local environment internals
 .freebuff/

@@ -88,33 +88,38 @@ jobs:
           if-no-files-found: error
 
   deploy-site:
-    name: Deploy site to Netlify
+    name: Deploy site to Vercel
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: build-site
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     env:
-      # Netlify credentials from the Netlify dashboard (Settings → Sites → your site
-      # → Site details → Access tokens). Mapped to job env vars because secrets
-      # can't be referenced in `if:` conditions.
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      # Vercel token from Vercel dashboard (Account → Settings → Tokens). The
+      # org/project IDs come from the committed .vercel/project.json. Mapped to a
+      # job env var because secrets can't be referenced in `if:` conditions.
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - name: Download site artifact
-        uses: actions/download-artifact@v8
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
-          name: site-dist
-          path: dist
+          node-version: 22
+          cache: npm
 
-      - name: Deploy to Netlify (production)
-        if: github.event_name == 'push' && env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
-        run: npx netlify-cli deploy --prod --dir=dist --message "Deploy of ${{ github.sha }}"
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Deploy to Netlify preview (pull request)
-        if: github.event_name == 'pull_request' && env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
-        run: npx netlify-cli deploy --dir=dist --alias "pr-${{ github.event.pull_request.number }}" --message "Preview deploy of ${{ github.sha }}"
+      - name: Deploy to Vercel (production)
+        if: github.event_name == 'push' && env.VERCEL_TOKEN != ''
+        run: npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
 
-      - name: Skip Netlify deploy (no secrets)
-        if: env.NETLIFY_AUTH_TOKEN == '' || env.NETLIFY_SITE_ID == ''
+      - name: Deploy to Vercel preview (pull request)
+        if: github.event_name == 'pull_request' && env.VERCEL_TOKEN != ''
+        run: npx vercel deploy --yes --token="$VERCEL_TOKEN"
+
+      - name: Skip Vercel deploy (no token)
+        if: env.VERCEL_TOKEN == ''
         run: |
-          echo "::notice::Netlify deploy skipped — add NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID repository secrets to enable it."
+          echo "::notice::Vercel deploy skipped — add a VERCEL_TOKEN repository secret to enable it."
