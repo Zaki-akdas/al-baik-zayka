@@ -13,7 +13,11 @@ export function FeaturedFood({ onOpen }: FeaturedFoodProps) {
   const { items, fromDb } = useMenuItems();
 
   const featured: MenuItem[] = fromDb
-    ? items.filter((item) => item.isPopular).slice(0, 6)
+    ? items
+        .filter(
+          (item) => item.isAvailable !== false && item.isPopular,
+        )
+        .slice(0, 6)
     : featuredItemIds
         .map((id) => items.find((item) => item.id === id))
         .filter((item): item is MenuItem => Boolean(item));

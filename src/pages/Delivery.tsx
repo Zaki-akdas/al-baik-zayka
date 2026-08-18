@@ -63,40 +63,40 @@ function DeliveryCard({ order }: { order: Order }) {
     .join(", ");
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-display text-lg uppercase tracking-wide">
+          <p className="font-display text-lg uppercase tracking-wide text-foreground">
             {formatOrderId(order._id)}
           </p>
-          <p className="text-xs text-white/45">{formatOrderTime(order.createdAt)}</p>
+          <p className="text-xs text-muted-foreground">{formatOrderTime(order.createdAt)}</p>
         </div>
-        <OrderStatusBadge status={order.status} />
+        <OrderStatusBadge status={order.status} theme="light" />
       </div>
 
       <div className="mt-4 space-y-2 text-sm">
-        <p className="font-semibold text-white/90">{order.customerName}</p>
+        <p className="font-semibold text-foreground">{order.customerName}</p>
         <a
           href={`tel:${order.customerPhone}`}
-          className="flex w-fit items-center gap-1.5 rounded-full border border-green-500/40 bg-green-500/10 px-3 py-1.5 font-bold text-green-300"
+          className="flex w-fit items-center gap-1.5 rounded-full border border-green-500/50 bg-green-100 px-3 py-1.5 font-bold text-green-800"
         >
           <Phone className="size-4" />
           {order.customerPhone}
         </a>
         {order.orderType === "delivery" && (
-          <p className="flex items-start gap-1.5 text-white/65">
-            <MapPin className="mt-0.5 size-4 shrink-0 text-gold" />
+          <p className="flex items-start gap-1.5 text-muted-foreground">
+            <MapPin className="mt-0.5 size-4 shrink-0 text-maroon" />
             {order.address}
           </p>
         )}
-        {order.notes && <p className="text-white/50">Note: {order.notes}</p>}
+        {order.notes && <p className="text-muted-foreground">Note: {order.notes}</p>}
       </div>
 
-      <div className="mt-3 rounded-xl border border-white/10 bg-night/50 p-3 text-sm text-white/75">
+      <div className="mt-3 rounded-xl border border-border bg-muted p-3 text-sm text-foreground/80">
         <p className="leading-relaxed">{itemsSummary}</p>
-        <p className="mt-2 font-display text-xl text-gold-bright">
+        <p className="mt-2 font-display text-xl text-maroon">
           ₹{order.total}
-          <span className="ml-2 text-xs font-sans font-medium text-white/40">
+          <span className="ml-2 text-xs font-sans font-medium text-muted-foreground">
             {order.orderType === "delivery" ? "Delivery" : "Pickup"}
           </span>
         </p>
@@ -125,33 +125,33 @@ export default function Delivery() {
   const orders = useQuery(api.orders.myAssigned);
 
   return (
-    <div className="min-h-screen bg-night text-cream">
-      <PanelHeader />
+    <div className="min-h-screen bg-background text-foreground">
+      <PanelHeader theme="light" />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-gold">
+        <p className="text-xs font-bold uppercase tracking-[0.25em] text-maroon">
           Delivery dashboard
         </p>
-        <h1 className="mt-3 font-display text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl">
+        <h1 className="mt-3 font-display text-5xl uppercase leading-[0.95] tracking-tight text-foreground sm:text-6xl">
           Assigned{" "}
-          <span className="font-script font-bold normal-case text-gold-bright">
+          <span className="font-script font-bold normal-case text-maroon">
             orders
           </span>
         </h1>
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
           Orders assigned to you by the restaurant, with one-tap status
           updates. Tap the phone number to call the customer.
         </p>
 
         {orders === undefined ? (
-          <p className="mt-8 text-sm text-white/50">Loading your orders…</p>
+          <p className="mt-8 text-sm text-muted-foreground">Loading your orders…</p>
         ) : orders.length === 0 ? (
-          <div className="mt-8 flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-14 text-center">
-            <span className="flex size-14 items-center justify-center rounded-full bg-gold/15 text-gold">
+          <div className="mt-8 flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-14 text-center shadow-sm">
+            <span className="flex size-14 items-center justify-center rounded-full bg-maroon/10 text-maroon">
               <Navigation className="size-6" />
             </span>
             <p className="font-semibold">No deliveries right now</p>
-            <p className="max-w-sm text-sm text-white/55">
+            <p className="max-w-sm text-sm text-muted-foreground">
               New orders assigned to you will appear here. Keep the app handy —
               your next run is on its way.
             </p>

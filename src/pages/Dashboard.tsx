@@ -41,7 +41,7 @@ function firstName(name?: string, email?: string): string {
 function OrderTimeline({ order }: { order: Order }) {
   if (order.status === "cancelled") {
     return (
-      <p className="text-xs font-semibold text-red-300">
+      <p className="text-xs font-semibold text-red-600">
         This order was cancelled.
       </p>
     );
@@ -57,16 +57,16 @@ function OrderTimeline({ order }: { order: Order }) {
             <span
               className={cn(
                 "flex size-4 shrink-0 items-center justify-center rounded-full border",
-                done && "border-gold bg-gold text-[#3a2403]",
-                !done && active && "border-gold text-gold",
-                !done && !active && "border-white/20 text-white/30",
+                done && "border-maroon bg-maroon text-cream",
+                !done && active && "border-maroon text-maroon",
+                !done && !active && "border-border text-muted-foreground/40",
               )}
             >
               {done && <Check className="size-3" />}
             </span>
             <span
               className={cn(
-                (done || active) ? "text-white/80" : "text-white/35",
+                (done || active) ? "text-foreground/80" : "text-muted-foreground/50",
               )}
             >
               {orderStatusLabels[step]}
@@ -84,48 +84,48 @@ function OrderCard({ order }: { order: Order }) {
     .join(", ");
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-display text-lg uppercase tracking-wide">
+          <p className="font-display text-lg uppercase tracking-wide text-foreground">
             {formatOrderId(order._id)}
           </p>
-          <p className="text-xs text-white/45">{formatOrderTime(order.createdAt)}</p>
+          <p className="text-xs text-muted-foreground">{formatOrderTime(order.createdAt)}</p>
         </div>
         <div className="flex items-center gap-2">
           {order.orderType === "delivery" ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white/70">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               <Truck className="size-3" /> Delivery
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white/70">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               <ShoppingBag className="size-3" /> Pickup
             </span>
           )}
-          <OrderStatusBadge status={order.status} />
+          <OrderStatusBadge status={order.status} theme="light" />
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <p className="text-sm leading-relaxed text-white/80">{itemsSummary}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{itemsSummary}</p>
           {order.orderType === "delivery" && order.address && (
-            <p className="mt-2 flex items-start gap-1.5 text-xs text-white/50">
-              <MapPin className="mt-0.5 size-3.5 shrink-0 text-gold" />
+            <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="mt-0.5 size-3.5 shrink-0 text-maroon" />
               {order.address}
             </p>
           )}
           {order.notes && (
-            <p className="mt-1 text-xs text-white/50">Note: {order.notes}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Note: {order.notes}</p>
           )}
           <OrderTimeline order={order} />
         </div>
         <div className="flex flex-col items-start justify-between gap-3 sm:items-end">
-          <p className="font-display text-3xl text-gold-bright">
+          <p className="font-display text-3xl text-maroon">
             ₹{order.total}
           </p>
           {order.status === "placed" && (
-            <p className="text-xs text-white/50">
+            <p className="text-xs text-muted-foreground">
               Waiting for the restaurant to confirm.
             </p>
           )}
@@ -140,22 +140,22 @@ export default function Dashboard() {
   const orders = useQuery(api.orders.myOrders);
 
   return (
-    <div className="min-h-screen bg-night text-cream">
-      <PanelHeader />
+    <div className="min-h-screen bg-background text-foreground">
+      <PanelHeader theme="light" />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         {/* Hero */}
         <section>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-gold">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-maroon">
             My Orders
           </p>
-          <h1 className="mt-3 font-display text-5xl uppercase leading-[0.95] tracking-tight sm:text-6xl">
+          <h1 className="mt-3 font-display text-5xl uppercase leading-[0.95] tracking-tight text-foreground sm:text-6xl">
             Namaste,{" "}
-            <span className="font-script font-bold normal-case text-gold-bright">
+            <span className="font-script font-bold normal-case text-maroon">
               {firstName(user?.name, user?.email)}
             </span>
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             Track your orders from the kitchen to your door. Hungry again? Head
             back to the menu.
           </p>
@@ -170,7 +170,7 @@ export default function Dashboard() {
               size="lg"
               variant="outline"
               asChild
-              className="h-12 border-white/15 px-7 text-base text-white/80 hover:bg-white/5 hover:text-white"
+              className="h-12 border-border px-7 text-base text-foreground/80 hover:bg-muted hover:text-foreground"
             >
               <a href={waLink(generalOrderMessage)} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="size-5" />
@@ -181,7 +181,7 @@ export default function Dashboard() {
               size="lg"
               variant="outline"
               asChild
-              className="h-12 border-white/15 px-7 text-base text-white/80 hover:bg-white/5 hover:text-white"
+              className="h-12 border-border px-7 text-base text-foreground/80 hover:bg-muted hover:text-foreground"
             >
               <a href={telLink}>
                 <Phone className="size-5" />
@@ -193,22 +193,22 @@ export default function Dashboard() {
 
         {/* Orders */}
         <section className="mt-12">
-          <h2 className="font-display text-2xl uppercase tracking-wide sm:text-3xl">
+          <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
             Your{" "}
-            <span className="font-script font-bold normal-case text-gold-bright">
+            <span className="font-script font-bold normal-case text-maroon">
               orders
             </span>
           </h2>
 
           {orders === undefined ? (
-            <p className="mt-6 text-sm text-white/50">Loading your orders…</p>
+            <p className="mt-6 text-sm text-muted-foreground">Loading your orders…</p>
           ) : orders.length === 0 ? (
-            <div className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-12 text-center">
-              <span className="flex size-14 items-center justify-center rounded-full bg-gold/15 text-gold">
+            <div className="mt-6 flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-12 text-center shadow-sm">
+              <span className="flex size-14 items-center justify-center rounded-full bg-maroon/10 text-maroon">
                 <ShoppingBag className="size-6" />
               </span>
               <p className="font-semibold">No orders yet</p>
-              <p className="max-w-sm text-sm text-white/55">
+              <p className="max-w-sm text-sm text-muted-foreground">
                 Your order history will show up here. Grab something delicious
                 from the menu to get started.
               </p>

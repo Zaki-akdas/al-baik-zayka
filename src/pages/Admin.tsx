@@ -74,8 +74,8 @@ const fallbackImage =
 
 function PanelLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-night">
-      <Loader2 className="size-6 animate-spin text-gold" />
+    <main className="flex min-h-screen items-center justify-center bg-background">
+      <Loader2 className="size-6 animate-spin text-maroon" />
     </main>
   );
 }
@@ -100,19 +100,19 @@ function AdminBootstrap() {
   };
 
   return (
-    <div className="min-h-screen bg-night text-cream">
+    <div className="min-h-screen bg-background text-foreground">
       <PanelHeader />
       <main className="mx-auto flex max-w-lg flex-col items-center px-4 py-16 text-center sm:px-6">
-        <span className="flex size-16 items-center justify-center rounded-full bg-gold/15 text-gold">
+        <span className="flex size-16 items-center justify-center rounded-full bg-maroon/10 text-maroon">
           <ShieldCheck className="size-8" />
         </span>
         <h1 className="mt-6 font-display text-4xl uppercase tracking-wide">
           Set up the{" "}
-          <span className="font-script font-bold normal-case text-gold-bright">
+          <span className="font-script font-bold normal-case text-maroon">
             admin
           </span>
         </h1>
-        <p className="mt-4 text-sm leading-relaxed text-white/60">
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           No admin exists yet. This first account can claim the admin role to
           manage the menu, prices, orders and delivery staff.
         </p>
@@ -152,7 +152,7 @@ function OrdersTab() {
   const [topItemsRange, setTopItemsRange] = useState<"today" | "all">("all");
 
   if (orders === undefined || users === undefined) {
-    return <p className="py-10 text-center text-sm text-white/50">Loading orders…</p>;
+    return <p className="py-10 text-center text-sm text-muted-foreground">Loading orders…</p>;
   }
 
   const topCategories =
@@ -189,17 +189,17 @@ function OrdersTab() {
 
       {/* Best sellers */}
       {topCategories.length > 0 && (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="flex items-center gap-2 font-display text-lg uppercase tracking-wide">
-              <Flame className="size-5 text-gold" />
+              <Flame className="size-5 text-maroon" />
               Top categories
             </h3>
             <div className="flex items-center gap-3">
-              <span className="hidden text-[11px] text-white/40 sm:inline">
+              <span className="hidden text-[11px] text-muted-foreground sm:inline">
                 by quantity • excludes cancelled
               </span>
-              <div className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1">
+              <div className="flex gap-1 rounded-full border border-border bg-muted p-1">
                 {(["today", "all"] as const).map((range) => (
                   <button
                     key={range}
@@ -209,7 +209,7 @@ function OrdersTab() {
                       "cursor-pointer rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider transition-colors",
                       topItemsRange === range
                         ? "bg-gold text-[#3a2403]"
-                        : "text-white/55 hover:text-white",
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     {range === "today" ? "Today" : "All time"}
@@ -224,22 +224,22 @@ function OrdersTab() {
               return (
                 <li key={group.name}>
                   <div className="flex items-center justify-between gap-3 text-sm">
-                    <span className="flex min-w-0 items-center gap-2.5 text-white/85">
-                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-maroon/50 font-display text-xs text-gold-bright">
+                    <span className="flex min-w-0 items-center gap-2.5 text-foreground">
+                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-maroon/10 font-display text-xs text-maroon">
                         {i + 1}
                       </span>
                       <span className="truncate font-medium">{group.name}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-3 text-xs">
-                      <span className="rounded-full border border-gold/40 bg-gold/15 px-2 py-0.5 font-bold text-gold">
+                      <span className="rounded-full border border-maroon/30 bg-maroon/10 px-2 py-0.5 font-bold text-maroon">
                         {group.qty} sold
                       </span>
-                      <span className="w-16 text-right font-semibold text-white/70">
+                      <span className="w-16 text-right font-semibold text-foreground/70">
                         ₹{group.revenue.toLocaleString("en-IN")}
                       </span>
                     </span>
                   </div>
-                  <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-maroon to-gold"
                       style={{
@@ -255,7 +255,7 @@ function OrdersTab() {
       )}
 
       {orders.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/50">
+        <div className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           No orders yet. Orders placed on the website appear here.
         </div>
       ) : (
@@ -293,20 +293,20 @@ function StatCard({
   tone?: "default" | "gold";
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-white/50">
-        <Icon className="size-4 text-gold" />
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <Icon className="size-4 text-maroon" />
         {label}
       </div>
       <p
         className={cn(
           "mt-2 font-display text-2xl tracking-wide sm:text-3xl",
-          tone === "gold" ? "text-gold-bright" : "text-cream",
+          tone === "gold" ? "text-maroon" : "text-foreground",
         )}
       >
         {value}
       </p>
-      {hint && <p className="mt-1 text-[11px] text-white/40">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -323,13 +323,13 @@ function OrderCard({
   onAssign: (id: Id<"users"> | null) => void;
 }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
+    <article className="rounded-2xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="font-display text-lg uppercase tracking-wide">
             {formatOrderId(order._id)}
           </p>
-          <p className="text-xs text-white/45">
+          <p className="text-xs text-muted-foreground">
             {formatOrderTime(order.createdAt)} •{" "}
             {order.orderType === "delivery" ? "Delivery" : "Pickup"}
           </p>
@@ -340,24 +340,24 @@ function OrderCard({
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         {/* Customer + items */}
         <div className="space-y-2 text-sm">
-          <p className="font-semibold text-white/90">{order.customerName}</p>
+          <p className="font-semibold text-foreground">{order.customerName}</p>
           <a
             href={`tel:${order.customerPhone}`}
-            className="flex w-fit items-center gap-1.5 text-gold-bright hover:text-gold"
+            className="flex w-fit items-center gap-1.5 text-maroon hover:text-maroon/70"
           >
             <Phone className="size-3.5" />
             {order.customerPhone}
           </a>
           {order.orderType === "delivery" && (
-            <p className="flex items-start gap-1.5 text-white/60">
-              <MapPin className="mt-0.5 size-3.5 shrink-0 text-gold" />
+            <p className="flex items-start gap-1.5 text-muted-foreground">
+              <MapPin className="mt-0.5 size-3.5 shrink-0 text-maroon" />
               {order.address}
             </p>
           )}
           {order.notes && (
-            <p className="text-white/50">Note: {order.notes}</p>
+            <p className="text-muted-foreground">Note: {order.notes}</p>
           )}
-          <ul className="space-y-0.5 border-t border-white/10 pt-2 text-white/70">
+          <ul className="space-y-0.5 border-t border-border pt-2 text-foreground/70">
             {order.items.map((it, i) => (
               <li key={i} className="flex justify-between gap-3">
                 <span>
@@ -366,7 +366,7 @@ function OrderCard({
                 <span className="shrink-0">₹{it.price * it.qty}</span>
               </li>
             ))}
-            <li className="flex justify-between gap-3 border-t border-white/10 pt-1.5 font-bold text-gold-bright">
+            <li className="flex justify-between gap-3 border-t border-border pt-1.5 font-bold text-maroon">
               <span>Total</span>
               <span>₹{order.total}</span>
             </li>
@@ -376,11 +376,11 @@ function OrderCard({
         {/* Controls */}
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label className="text-[11px] uppercase tracking-wider text-white/50">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
               Status
             </Label>
             <Select value={order.status} onValueChange={(v) => onStatus(v as (typeof ORDER_STATUSES)[number])}>
-              <SelectTrigger className="h-10 border-white/15 bg-white/5 text-white">
+              <SelectTrigger className="h-10 border-border bg-background text-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -393,14 +393,14 @@ function OrderCard({
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[11px] uppercase tracking-wider text-white/50">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
               Delivery person
             </Label>
             <Select
               value={order.deliveryPersonId ?? "none"}
               onValueChange={(v) => onAssign(v === "none" ? null : (v as Id<"users">))}
             >
-              <SelectTrigger className="h-10 border-white/15 bg-white/5 text-white">
+              <SelectTrigger className="h-10 border-border bg-background text-foreground">
                 <SelectValue placeholder="Assign a delivery person" />
               </SelectTrigger>
               <SelectContent>
@@ -546,7 +546,7 @@ function ProductsTab() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-white/55">
+        <p className="text-sm text-muted-foreground">
           {products === undefined
             ? "Loading…"
             : `${products.length} item${products.length === 1 ? "" : "s"} on the menu`}
@@ -556,7 +556,7 @@ function ProductsTab() {
             <Button
               variant="outline"
               onClick={importStarter}
-              className="border-white/15 text-white/80 hover:bg-white/5 hover:text-white"
+              className="border-border text-foreground/80 hover:bg-muted hover:text-foreground"
             >
               <UtensilsCrossed className="size-4" />
               Import starter menu
@@ -570,11 +570,11 @@ function ProductsTab() {
       </div>
 
       {products === undefined ? (
-        <p className="py-10 text-center text-sm text-white/50">Loading products…</p>
+        <p className="py-10 text-center text-sm text-muted-foreground">Loading products…</p>
       ) : products.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center">
-          <Package className="mx-auto size-8 text-white/30" />
-          <p className="mt-3 text-sm text-white/60">
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <Package className="mx-auto size-8 text-muted-foreground/60" />
+          <p className="mt-3 text-sm text-muted-foreground">
             No products yet. Import the starter menu or add your first product.
           </p>
         </div>
@@ -583,7 +583,7 @@ function ProductsTab() {
           {products.map((p) => (
             <article
               key={p._id}
-              className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+              className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
             >
               <div className="relative aspect-[16/9] overflow-hidden">
                 <img src={p.image} alt={p.name} loading="lazy" className="size-full object-cover" />
@@ -592,8 +592,8 @@ function ProductsTab() {
                   className={cn(
                     "absolute top-3 left-3 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
                     p.isAvailable
-                      ? "border-green-500/40 bg-green-500/15 text-green-300"
-                      : "border-red-500/40 bg-red-500/15 text-red-300",
+                      ? "border-green-500/50 bg-green-100 text-green-800"
+                      : "border-red-500/50 bg-red-100 text-red-800",
                   )}
                 >
                   {p.isAvailable ? "Available" : "Sold out"}
@@ -611,7 +611,7 @@ function ProductsTab() {
                     <Button
                       variant="outline"
                       size="icon-sm"
-                      className="size-8 border-white/15 text-white/70 hover:bg-white/5 hover:text-white"
+                      className="size-8 border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                       onClick={() => openEdit(p)}
                       aria-label={`Edit ${p.name}`}
                     >
@@ -620,7 +620,7 @@ function ProductsTab() {
                     <Button
                       variant="outline"
                       size="icon-sm"
-                      className="size-8 border-white/15 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                      className="size-8 border-border text-red-600 hover:bg-red-50 hover:text-red-700"
                       onClick={() => setDeleting(p)}
                       aria-label={`Delete ${p.name}`}
                     >
@@ -628,26 +628,26 @@ function ProductsTab() {
                     </Button>
                   </span>
                 </div>
-                <p className="mt-0.5 text-xs text-white/45">{p.category}</p>
-                <p className="mt-1.5 line-clamp-2 text-sm text-white/65">
+                <p className="mt-0.5 text-xs text-muted-foreground">{p.category}</p>
+                <p className="mt-1.5 line-clamp-2 text-sm text-foreground/70">
                   {p.description}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-1.5 pt-3 text-[10px] font-bold uppercase tracking-wider">
                   {p.veg === true && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-green-500/15 px-2 py-0.5 text-green-300">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-green-800">
                       <Leaf className="size-3" /> Veg
                     </span>
                   )}
                   {p.veg === false && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-red-300">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-red-800">
                       <BadgeCheck className="size-3" /> Non-veg
                     </span>
                   )}
                   {p.isPopular && (
-                    <span className="rounded-full bg-gold/15 px-2 py-0.5 text-gold">Popular</span>
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">Popular</span>
                   )}
                   {p.isOffer && (
-                    <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-violet-300">Combo</span>
+                    <span className="rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">Combo</span>
                   )}
                 </div>
               </div>
@@ -658,36 +658,36 @@ function ProductsTab() {
 
       {/* Add / Edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto border-white/10 bg-night text-cream sm:max-w-lg">
+        <DialogContent className="max-h-[90vh] overflow-y-auto border-border bg-card text-foreground sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl uppercase tracking-wide">
               {editing ? "Edit product" : "Add product"}
             </DialogTitle>
-            <DialogDescription className="text-white/55">
+            <DialogDescription className="text-muted-foreground">
               Changes go live on the website menu instantly.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label className="text-white/70">Name</Label>
+              <Label className="text-foreground/80">Name</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Zayka Special Burger"
-                className="border-white/15 bg-white/5 text-white placeholder:text-white/35"
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/70">Category</Label>
+              <Label className="text-foreground/80">Category</Label>
               <Input
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="Burgers"
-                className="border-white/15 bg-white/5 text-white placeholder:text-white/35"
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/70">Price (₹)</Label>
+              <Label className="text-foreground/80">Price (₹)</Label>
               <Input
                 type="number"
                 min={0}
@@ -695,35 +695,35 @@ function ProductsTab() {
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 placeholder="129"
-                className="border-white/15 bg-white/5 text-white placeholder:text-white/35"
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label className="text-white/70">Description</Label>
+              <Label className="text-foreground/80">Description</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="What makes this dish special…"
                 rows={2}
-                className="border-white/15 bg-white/5 text-white placeholder:text-white/35"
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
-              <Label className="text-white/70">Image URL</Label>
+              <Label className="text-foreground/80">Image URL</Label>
               <Input
                 value={form.image}
                 onChange={(e) => setForm({ ...form, image: e.target.value })}
                 placeholder="https://…"
-                className="border-white/15 bg-white/5 text-white placeholder:text-white/35"
+                className="border-border bg-background text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/70">Type</Label>
+              <Label className="text-foreground/80">Type</Label>
               <Select
                 value={form.veg}
                 onValueChange={(v) => setForm({ ...form, veg: v as ProductFormState["veg"] })}
               >
-                <SelectTrigger className="border-white/15 bg-white/5 text-white">
+                <SelectTrigger className="border-border bg-background text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -734,21 +734,21 @@ function ProductsTab() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/70">Availability</Label>
+              <Label className="text-foreground/80">Availability</Label>
               <Switch
                 checked={form.isAvailable}
                 onCheckedChange={(v) => setForm({ ...form, isAvailable: v })}
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/70">Popular</Label>
+              <Label className="text-foreground/80">Popular</Label>
               <Switch
                 checked={form.isPopular}
                 onCheckedChange={(v) => setForm({ ...form, isPopular: v })}
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/70">Combo / Offer</Label>
+              <Label className="text-foreground/80">Combo / Offer</Label>
               <Switch
                 checked={form.isOffer}
                 onCheckedChange={(v) => setForm({ ...form, isOffer: v })}
@@ -759,7 +759,7 @@ function ProductsTab() {
             <Button
               variant="outline"
               onClick={() => setDialogOpen(false)}
-              className="border-white/15 text-white/80 hover:bg-white/5 hover:text-white"
+              className="border-border text-foreground/80 hover:bg-muted hover:text-foreground"
             >
               Cancel
             </Button>
@@ -772,12 +772,12 @@ function ProductsTab() {
 
       {/* Delete confirm */}
       <Dialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
-        <DialogContent className="border-white/10 bg-night text-cream sm:max-w-sm">
+        <DialogContent className="border-border bg-card text-foreground sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="font-display text-xl uppercase tracking-wide">
               Remove product?
             </DialogTitle>
-            <DialogDescription className="text-white/55">
+            <DialogDescription className="text-muted-foreground">
               “{deleting?.name}” will disappear from the website menu. Past
               orders keep their own copy of the item.
             </DialogDescription>
@@ -786,7 +786,7 @@ function ProductsTab() {
             <Button
               variant="outline"
               onClick={() => setDeleting(null)}
-              className="border-white/15 text-white/80 hover:bg-white/5 hover:text-white"
+              className="border-border text-foreground/80 hover:bg-muted hover:text-foreground"
             >
               Keep it
             </Button>
@@ -812,7 +812,7 @@ function StaffTab() {
   const setRole = useMutation(api.roles.setRole);
 
   if (users === undefined) {
-    return <p className="py-10 text-center text-sm text-white/50">Loading users…</p>;
+    return <p className="py-10 text-center text-sm text-muted-foreground">Loading users…</p>;
   }
 
   const changeRole = async (userId: Id<"users">, role: string) => {
@@ -829,32 +829,32 @@ function StaffTab() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-white/55">
+      <p className="text-sm text-muted-foreground">
         Make users delivery persons so you can assign orders to them. The
         delivery person sees assigned orders in their Delivery dashboard.
       </p>
       {users.length === 0 ? (
-        <p className="rounded-2xl border border-white/10 bg-white/5 p-10 text-center text-sm text-white/50">
+        <p className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           No users yet.
         </p>
       ) : (
         users.map((u) => (
           <div
             key={u._id}
-            className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-maroon/40 font-display text-base uppercase text-gold-bright">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-maroon/10 font-display text-base uppercase text-maroon">
                 {(u.name ?? u.email ?? "?").slice(0, 1)}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-white/90">
+                <p className="truncate text-sm font-semibold text-foreground">
                   {u.name ?? "No name"}
                 </p>
-                <p className="truncate text-xs text-white/45">
+                <p className="truncate text-xs text-muted-foreground">
                   {u.email ?? "No email"}
                 </p>
-                <span className="mt-1 inline-block rounded-full border border-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/60">
+                <span className="mt-1 inline-block rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {u.role ?? "user"}
                 </span>
               </div>
@@ -864,7 +864,7 @@ function StaffTab() {
                 value={u.role ?? "user"}
                 onValueChange={(v) => changeRole(u._id, v)}
               >
-                <SelectTrigger className="h-10 border-white/15 bg-white/5 text-white">
+                <SelectTrigger className="h-10 border-border bg-background text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -954,27 +954,27 @@ function DatabaseTab() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gold/15 text-gold">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-maroon/10 text-maroon">
             <Database className="size-5" />
           </span>
           <div>
             <h3 className="font-display text-lg uppercase tracking-wide">
               Supabase Postgres
             </h3>
-            <p className="text-xs leading-relaxed text-white/50">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               External database connected from Convex node actions. The
               connection string lives in the project Keys tab as{" "}
-              <code className="rounded bg-white/10 px-1 py-0.5 text-gold-bright">
+              <code className="rounded bg-muted px-1 py-0.5 text-maroon">
                 DATABASE_URL
               </code>
               . Use the pooler host — the direct{" "}
-              <code className="rounded bg-white/10 px-1 py-0.5">
+              <code className="rounded bg-muted px-1 py-0.5">
                 db.&lt;ref&gt;.supabase.co
               </code>{" "}
               host is IPv6-only:
-              <code className="mt-1 block break-all rounded bg-white/10 px-2 py-1 text-[11px] text-gold-bright">
+              <code className="mt-1 block break-all rounded bg-muted px-2 py-1 text-[11px] text-maroon">
                 postgresql://postgres.&lt;project-ref&gt;:&lt;password&gt;@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres
               </code>
             </p>
@@ -991,22 +991,22 @@ function DatabaseTab() {
       </div>
 
       {/* Order history export via Supabase */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-maroon/40 text-gold-bright">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-maroon/10 text-maroon">
             <FileSpreadsheet className="size-5" />
           </span>
           <div>
             <h3 className="font-display text-lg uppercase tracking-wide">
               Order history export
             </h3>
-            <p className="text-xs leading-relaxed text-white/50">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               Orders are auto-synced into the Supabase{" "}
-              <code className="rounded bg-white/10 px-1 py-0.5 text-gold-bright">
+              <code className="rounded bg-muted px-1 py-0.5 text-maroon">
                 orders
               </code>{" "}
               table whenever one is placed or its status/assignment changes.
-              Use <span className="font-semibold text-white/70">Sync orders</span>{" "}
+              Use <span className="font-semibold text-foreground/80">Sync orders</span>{" "}
               for a manual refresh, then download the history as a CSV for
               Excel or Google Sheets.
             </p>
@@ -1021,32 +1021,32 @@ function DatabaseTab() {
             variant="outline"
             onClick={doExport}
             disabled={exporting}
-            className="border-white/15 text-white/80 hover:bg-white/5 hover:text-white"
+            className="border-border text-foreground/80 hover:bg-muted hover:text-foreground"
           >
             <Download className="size-4" />
             {exporting ? "Preparing…" : "Download CSV"}
           </Button>
         </div>
         {lastSync && (
-          <p className="mt-3 text-xs font-medium text-green-300">{lastSync}</p>
+          <p className="mt-3 text-xs font-medium text-green-700">{lastSync}</p>
         )}
       </div>
 
       {result &&
         (result.connected ? (
-          <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-5">
-            <p className="flex items-center gap-2 font-bold text-green-300">
+          <div className="rounded-2xl border border-green-500/40 bg-green-50 p-5">
+            <p className="flex items-center gap-2 font-bold text-green-700">
               <CheckCircle2 className="size-5" />
               Connected to {result.database ?? "postgres"}
             </p>
-            <p className="mt-2 text-xs leading-relaxed text-green-200/70">
+            <p className="mt-2 text-xs leading-relaxed text-green-700/80">
               {result.version}
             </p>
-            <p className="mt-3 text-xs font-bold uppercase tracking-wider text-green-300/80">
+            <p className="mt-3 text-xs font-bold uppercase tracking-wider text-green-700">
               Tables in public schema
             </p>
             {result.tables.length === 0 ? (
-              <p className="mt-1 text-xs text-green-200/60">
+              <p className="mt-1 text-xs text-green-700/70">
                 No tables yet — ready for the first one.
               </p>
             ) : (
@@ -1054,7 +1054,7 @@ function DatabaseTab() {
                 {result.tables.map((t) => (
                   <span
                     key={t}
-                    className="rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-xs text-green-200"
+                    className="rounded-full border border-green-500/40 bg-green-100 px-2.5 py-1 text-xs text-green-800"
                   >
                     {t}
                   </span>
@@ -1063,12 +1063,12 @@ function DatabaseTab() {
             )}
           </div>
         ) : (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-5">
-            <p className="flex items-center gap-2 font-bold text-red-300">
+          <div className="rounded-2xl border border-red-500/40 bg-red-50 p-5">
+            <p className="flex items-center gap-2 font-bold text-red-700">
               <XCircle className="size-5" />
               Not connected
             </p>
-            <p className="mt-2 break-words text-xs leading-relaxed text-red-200/80">
+            <p className="mt-2 break-words text-xs leading-relaxed text-red-700/80">
               {result.error}
             </p>
           </div>
@@ -1093,13 +1093,13 @@ function AdminPanel() {
   const [tab, setTab] = useState<TabId>("orders");
 
   return (
-    <div className="min-h-screen bg-night text-cream">
+    <div className="min-h-screen bg-background text-foreground">
       <PanelHeader
         right={
           <Button
             variant="ghost"
             asChild
-            className="hidden text-white/70 hover:bg-white/5 hover:text-gold-bright sm:inline-flex"
+            className="hidden text-muted-foreground hover:bg-muted hover:text-maroon sm:inline-flex"
           >
             <Link to="/">
               <UtensilsCrossed className="size-4" />
@@ -1110,12 +1110,12 @@ function AdminPanel() {
       />
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-gold">
+        <p className="text-xs font-bold uppercase tracking-[0.25em] text-maroon">
           Admin panel
         </p>
         <h1 className="mt-2 font-display text-4xl uppercase leading-[0.95] tracking-tight sm:text-5xl">
           Full{" "}
-          <span className="font-script font-bold normal-case text-gold-bright">
+          <span className="font-script font-bold normal-case text-maroon">
             control
           </span>
         </h1>
@@ -1131,7 +1131,7 @@ function AdminPanel() {
                 "flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
                 tab === t.id
                   ? "border-gold bg-gold text-[#3a2403]"
-                  : "border-white/15 bg-white/5 text-white/65 hover:text-white",
+                  : "border-border bg-card text-muted-foreground hover:text-foreground",
               )}
             >
               <t.icon className="size-4" />

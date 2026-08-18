@@ -5,9 +5,16 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LogoBadge } from "@/components/restaurant/LogoBadge";
 import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 
-/** Dark panel header with brand, back-to-site, optional links and sign out. */
-export function PanelHeader({ right }: { right?: ReactNode }) {
+interface PanelHeaderProps {
+  right?: ReactNode;
+  /** "light" for cream/paper pages (customer dashboard), "dark" for night pages. */
+  theme?: "light" | "dark";
+}
+
+/** Shared panel header with brand, back-to-site, optional links and sign out. */
+export function PanelHeader({ right, theme = "dark" }: PanelHeaderProps) {
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -16,8 +23,12 @@ export function PanelHeader({ right }: { right?: ReactNode }) {
     navigate("/");
   };
 
+  const light = theme === "light";
+
   return (
-    <header className="border-b border-white/10">
+    <header
+      className={cn("border-b", light ? "border-border" : "border-white/10")}
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link
           to="/"
@@ -26,7 +37,12 @@ export function PanelHeader({ right }: { right?: ReactNode }) {
         >
           <LogoBadge className="size-10" />
           <span className="leading-none">
-            <span className="block font-display text-lg uppercase tracking-wide">
+            <span
+              className={cn(
+                "block font-display text-lg uppercase tracking-wide",
+                light ? "text-foreground" : "text-cream",
+              )}
+            >
               Al-Baik
             </span>
             <span className="block font-script text-lg font-bold leading-tight text-gold-bright">
@@ -38,7 +54,11 @@ export function PanelHeader({ right }: { right?: ReactNode }) {
           <Button
             variant="ghost"
             asChild
-            className="text-white/70 hover:bg-white/5 hover:text-gold-bright"
+            className={
+              light
+                ? "text-muted-foreground hover:bg-muted hover:text-foreground"
+                : "text-white/70 hover:bg-white/5 hover:text-gold-bright"
+            }
           >
             <Link to="/">
               <ArrowLeft className="size-4" />
@@ -49,7 +69,11 @@ export function PanelHeader({ right }: { right?: ReactNode }) {
           <Button
             variant="outline"
             onClick={handleSignOut}
-            className="border-white/15 text-white/80 hover:bg-white/5 hover:text-white"
+            className={
+              light
+                ? "border-border text-foreground hover:bg-muted hover:text-foreground"
+                : "border-white/15 text-white/80 hover:bg-white/5 hover:text-white"
+            }
           >
             Sign out
           </Button>
