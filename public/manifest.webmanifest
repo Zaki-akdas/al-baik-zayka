@@ -1,17 +1,19 @@
 {
-  "name": "freebuff.com application",
-  "short_name": "freebuff.com",
-  "description": "freebuff.com application",
+  "name": "Al-Baik Zayka | Fast Food & Home Delivery",
+  "short_name": "Al-Baik Zayka",
+  "description": "Delicious fast food, affordable combos and home delivery from Al-Baik Zayka. Order online, track deliveries and explore our menu.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#FEFAF6",
+  "theme_color": "#65151B",
+  "orientation": "portrait-primary",
+  "categories": ["food", "shopping"],
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/logo.svg",
       "sizes": "any",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }

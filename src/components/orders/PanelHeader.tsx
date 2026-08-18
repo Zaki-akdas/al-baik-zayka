@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 import { Button } from "@/components/ui/button";
 import { LogoBadge } from "@/components/restaurant/LogoBadge";
@@ -66,6 +67,7 @@ export function PanelHeader({ right, theme = "dark" }: PanelHeaderProps) {
             </Link>
           </Button>
           {right}
+          <ThemeToggle />
           <Button
             variant="outline"
             onClick={handleSignOut}

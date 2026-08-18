@@ -4,6 +4,8 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { RequireRole } from "@/components/RequireRole";
 import { CartProvider } from "@/lib/cart";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
+import { ThemeProvider } from "next-themes";
+import { NotificationManager } from "@/components/NotificationManager";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
@@ -18,6 +20,7 @@ import "@fontsource/caveat/600.css";
 import "@fontsource/caveat/700.css";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import "./index.css";
 
 // Lazy load route components for better code splitting
@@ -127,10 +130,13 @@ createRoot(document.getElementById("root")!).render(
       <ToolbarErrorBoundary>
         <VlyToolbar />
       </ToolbarErrorBoundary>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <ConvexAuthProvider client={convex}>
         <BrowserRouter>
+          <ScrollToTop />
           <RouteSyncer />
           <CartProvider>
+            <NotificationManager />
             <Suspense fallback={<RouteLoading />}>
               <Routes>
                 <Route path="/" element={<Landing />} />
@@ -162,6 +168,7 @@ createRoot(document.getElementById("root")!).render(
         </BrowserRouter>
         <Toaster />
       </ConvexAuthProvider>
+      </ThemeProvider>
     </RootErrorBoundary>
   </StrictMode>,
 );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Menu, Phone, ShoppingBag, User } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -96,7 +97,7 @@ export function Navbar() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
@@ -127,6 +128,7 @@ export function Navbar() {
           >
             Order Now
           </Button>
+          <ThemeToggle className="hidden sm:inline-flex" />
           <Button
             variant="outline"
             size="icon"
@@ -181,6 +183,10 @@ export function Navbar() {
             )}
           </nav>
           <div className="mt-auto space-y-2 border-t px-4 py-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-muted-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
             <Button
               variant="outline"
               className="w-full"

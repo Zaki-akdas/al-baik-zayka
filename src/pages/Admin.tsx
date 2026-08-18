@@ -20,6 +20,8 @@ import {
   Plus,
   Receipt,
   RefreshCw,
+  Search,
+  SearchX,
   ShieldCheck,
   ShoppingBag,
   Trash2,
@@ -35,6 +37,7 @@ import type { Doc, Id } from "@/convex/_generated/dataModel";
 import type { DbStatusResult } from "@/convex/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -61,6 +64,7 @@ import {
   formatOrderId,
   formatOrderTime,
   orderStatusLabels,
+  type OrderStatus,
 } from "@/data/orders";
 import { computeOrderStats } from "@/lib/order-stats";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
@@ -150,10 +154,57 @@ function OrdersTab() {
     [orders],
   );
   const [topItemsRange, setTopItemsRange] = useState<"today" | "all">("all");
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
 
   if (orders === undefined || users === undefined) {
-    return <p className="py-10 text-center text-sm text-muted-foreground">Loading orders…</p>;
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-2xl border border-border bg-card p-4">
+              <Skeleton className="mb-2 h-3 w-28" />
+              <Skeleton className="h-7 w-20" />
+            </div>
+          ))}
+        </div>
+        {[1, 2].map((i) => (
+          <div key={i} className="rounded-2xl border border-border bg-card p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <Skeleton className="mb-2 h-5 w-20" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <div>
+                <Skeleton className="mb-2 h-3 w-48" />
+                <Skeleton className="mb-1 h-3 w-36" />
+                <Skeleton className="h-3 w-40" />
+              </div>
+              <div>
+                <Skeleton className="mb-2 h-3 w-24" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
+
+  // Filter orders
+  const filteredOrders = orders.filter((order) => {
+    const q = orderSearch.trim().toLowerCase();
+    const matchesSearch = !q ||
+      order.customerName.toLowerCase().includes(q) ||
+      order.customerPhone.includes(q) ||
+      formatOrderId(order._id).toLowerCase().includes(q) ||
+      order.items.some((it) => it.name.toLowerCase().includes(q));
+    const matchesStatus = orderStatusFilter === "all" || order.status === orderStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const topCategories =
     topItemsRange === "all" ? stats.topCategoriesAllTime : stats.topCategories;
@@ -254,12 +305,52 @@ function OrdersTab() {
         </div>
       )}
 
-      {orders.length === 0 ? (
+      {/* Search & filter */}
+      {orders.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={orderSearch}
+              onChange={(e) => setOrderSearch(e.target.value)}
+              placeholder="Search by name, phone, order ID, or item…"
+              className="h-10 rounded-full border-border bg-background pl-9 text-foreground placeholder:text-muted-foreground"
+              aria-label="Search orders"
+            />
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto">
+            {["all", ...ORDER_STATUSES].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setOrderStatusFilter(s)}
+                className={cn(
+                  "shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors",
+                  orderStatusFilter === s
+                    ? "border-gold bg-gold text-[#3a2403]"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {s === "all" ? "All" : orderStatusLabels[s as OrderStatus]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {filteredOrders.length === 0 && orders.length > 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <SearchX className="mx-auto size-8 text-muted-foreground/60" />
+          <p className="mt-3 text-sm text-muted-foreground">
+            No orders match your search. Try a different keyword or clear the filter.
+          </p>
+        </div>
+      ) : filteredOrders.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
           No orders yet. Orders placed on the website appear here.
         </div>
       ) : (
-        orders.map((order) => (
+        filteredOrders.map((order) => (
           <OrderCard
             key={order._id}
             order={order}
@@ -570,7 +661,19 @@ function ProductsTab() {
       </div>
 
       {products === undefined ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">Loading products…</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
+              <Skeleton className="aspect-[16/9] w-full" />
+              <div className="p-4">
+                <Skeleton className="mb-2 h-5 w-3/4" />
+                <Skeleton className="mb-1 h-3 w-1/3" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="mt-1 h-3 w-2/3" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : products.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
           <Package className="mx-auto size-8 text-muted-foreground/60" />
