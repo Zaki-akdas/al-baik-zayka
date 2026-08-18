@@ -35,6 +35,9 @@ lerna-debug.log*
 *.sw?
 .convex-local/
 
+# Vercel
+.vercel/
+
 # Local environment internals
 .freebuff/
 
