@@ -1,14 +1,40 @@
+import { useMemo } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { useQuery } from "convex/react";
 
 import { Badge } from "@/components/ui/badge";
-import { offers } from "@/data/offers";
+import { api } from "@/convex/_generated/api";
+import { offers as staticOffers, type Offer } from "@/data/offers";
 import { offerOrderMessage, waLink } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./SectionHeading";
 
 export function Offers() {
-  const [heroOffer, ...rest] = offers;
+  const dbOffers = useQuery(api.offers.listActive);
+
+  // Use database offers if available, otherwise fall back to static data
+  const allOffers: Offer[] = useMemo(() => {
+    if (dbOffers && dbOffers.length > 0) {
+      return dbOffers.map((o) => ({
+        id: o._id,
+        title: o.title,
+        badge: o.badge,
+        description: o.description,
+        price: o.price ?? null,
+        originalPrice: o.originalPrice ?? null,
+        image: o.image,
+        validUntil: o.validUntil ?? null,
+        isActive: o.isActive,
+      }));
+    }
+    return staticOffers;
+  }, [dbOffers]);
+
+  const [heroOffer, ...rest] = allOffers;
+
+  // Don't render if no offers
+  if (!heroOffer) return null;
 
   return (
     <section
@@ -45,6 +71,18 @@ export function Offers() {
                 <Badge className="absolute top-4 left-4 border-transparent bg-gold text-[10px] font-extrabold tracking-widest text-[#3a2403]">
                   {heroOffer.badge}
                 </Badge>
+                {heroOffer.price !== null && (
+                  <div className="absolute right-4 bottom-4 text-right">
+                    <span className="font-display text-3xl text-gold-bright">
+                      ₹{heroOffer.price}
+                    </span>
+                    {heroOffer.originalPrice !== null && (
+                      <span className="ml-2 text-sm text-white/50 line-through">
+                        ₹{heroOffer.originalPrice}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="flex flex-1 flex-col p-6 sm:p-7">
                 <h3 className="font-display text-3xl uppercase tracking-wide sm:text-4xl">
@@ -53,6 +91,11 @@ export function Offers() {
                 <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70 sm:text-base">
                   {heroOffer.description}
                 </p>
+                {heroOffer.validUntil && (
+                  <p className="mt-2 text-xs text-white/40">
+                    Valid until {heroOffer.validUntil}
+                  </p>
+                )}
                 <a
                   href={waLink(offerOrderMessage(heroOffer.title))}
                   target="_blank"
@@ -89,6 +132,11 @@ export function Offers() {
                     >
                       {offer.badge}
                     </Badge>
+                    {offer.price !== null && (
+                      <span className="absolute right-3 bottom-3 font-display text-xl text-gold-bright">
+                        ₹{offer.price}
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="font-display text-xl uppercase tracking-wide">
@@ -97,6 +145,11 @@ export function Offers() {
                     <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/65">
                       {offer.description}
                     </p>
+                    {offer.validUntil && (
+                      <p className="mt-1 text-[11px] text-white/40">
+                        Valid until {offer.validUntil}
+                      </p>
+                    )}
                     <a
                       href={waLink(offerOrderMessage(offer.title))}
                       target="_blank"

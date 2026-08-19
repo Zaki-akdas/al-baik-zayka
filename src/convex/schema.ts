@@ -81,6 +81,25 @@ const schema = defineSchema(
       .index("by_user", ["userId"])
       .index("by_status", ["status"])
       .index("by_delivery", ["deliveryPersonId"]),
+
+    /** Combo offers managed by the admin. */
+    offers: defineTable({
+      title: v.string(),
+      badge: v.union(
+        v.literal("COMBO"),
+        v.literal("TODAY'S SPECIAL"),
+        v.literal("LIMITED OFFER"),
+        v.literal("NEW"),
+      ),
+      description: v.string(),
+      price: v.optional(v.number()),
+      originalPrice: v.optional(v.number()),
+      image: v.string(),
+      validUntil: v.optional(v.string()),
+      isActive: v.boolean(),
+      sortOrder: v.number(),
+      createdAt: v.number(),
+    }),
   },
   {
     schemaValidation: false,

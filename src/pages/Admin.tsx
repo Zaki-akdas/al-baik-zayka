@@ -25,6 +25,7 @@ import {
   SearchX,
   ShieldCheck,
   ShoppingBag,
+  Tag,
   Trash2,
   Users,
   UtensilsCrossed,
@@ -70,6 +71,7 @@ import {
 import { computeOrderStats } from "@/lib/order-stats";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
+import OffersTab from "@/components/admin/OffersTab";
 import { StarRating } from "@/components/StarRating";
 
 type Product = Doc<"products">;
@@ -1201,6 +1203,7 @@ const tabs = [
   { id: "orders", label: "Orders", icon: LayoutDashboard },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "products", label: "Products", icon: Package },
+  { id: "offers", label: "Offers", icon: Tag },
   { id: "staff", label: "Delivery Staff", icon: Users },
   { id: "database", label: "Database", icon: Database },
 ] as const;
@@ -1272,6 +1275,7 @@ function AdminPanel() {
             </React.Suspense>
           )}
           {tab === "products" && <ProductsTab />}
+          {tab === "offers" && <OffersTab />}
           {tab === "staff" && <StaffTab />}
           {tab === "database" && <DatabaseTab />}
         </div>
