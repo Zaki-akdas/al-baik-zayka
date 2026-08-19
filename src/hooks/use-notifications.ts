@@ -49,9 +49,8 @@ export function useNotifications() {
             icon: "/logo.svg",
             badge: "/logo.svg",
             tag: orderId ? `order-${orderId}` : undefined,
-            renotify: true,
             vibrate: [200, 100, 200],
-          });
+          } as NotificationOptions);
 
           notification.onclick = () => {
             window.focus();

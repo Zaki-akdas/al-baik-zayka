@@ -19,6 +19,9 @@ export interface OrderLike {
   status: string;
   total: number;
   items: OrderLine[];
+  orderType?: string;
+  customerName?: string;
+  customerPhone?: string;
 }
 
 /**
@@ -108,5 +111,184 @@ export function computeOrderStats(
     pendingCount: orders.filter((o) => PENDING_STATUSES.has(o.status)).length,
     topCategories: todayRank.groups,
     topCategoriesAllTime: allTimeRank.groups,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Analytics — richer analytics data for the admin dashboard           */
+/* ------------------------------------------------------------------ */
+
+export interface DailyRevenue {
+  date: string;       // "Mon 14" label
+  timestamp: number;  // start-of-day timestamp for sorting
+  revenue: number;
+  orders: number;
+  itemsSold: number;
+  avgOrderValue: number;
+}
+
+export interface StatusBreakdown {
+  status: string;
+  count: number;
+  revenue: number;
+}
+
+export interface CustomerInsight {
+  name: string;
+  phone: string;
+  orderCount: number;
+  totalSpent: number;
+  lastOrder: number;
+}
+
+export interface HourlyDistribution {
+  hour: number;
+  count: number;
+}
+
+export interface AnalyticsData {
+  /** Last 7 days of revenue data (or fewer if history is short). */
+  dailyRevenue: DailyRevenue[];
+  /** All-time total revenue and order count. */
+  allTime: { revenue: number; orders: number; avgOrderValue: number };
+  /** Revenue & order count for today, this week, this month. */
+  periods: {
+    today: { revenue: number; orders: number };
+    week: { revenue: number; orders: number };
+    month: { revenue: number; orders: number };
+  };
+  /** Orders broken down by status. */
+  statusBreakdown: StatusBreakdown[];
+  /** Top customers by order count. */
+  topCustomers: CustomerInsight[];
+  /** Peak ordering hours (0–23). */
+  hourlyDistribution: HourlyDistribution[];
+  /** Delivery vs pickup split. */
+  orderTypeSplit: { delivery: number; pickup: number };
+}
+
+/** Format a timestamp to a short day label like "Mon 14". */
+function dayLabel(ts: number): string {
+  const d = new Date(ts);
+  return d.toLocaleDateString(undefined, { weekday: "short", day: "numeric" });
+}
+
+/** Start-of-day timestamp (local midnight). */
+function startOfDay(ts: number): number {
+  const d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
+  const allTime = orders.filter((o) => o.status !== "cancelled");
+  const now = Date.now();
+  const todayStart = startOfToday();
+  const weekStart = startOfDay(now - 6 * 86_400_000);
+  const monthStart = startOfDay(now - 29 * 86_400_000);
+
+  // ---------- All-time totals ----------
+  const allTimeRevenue = allTime.reduce((s, o) => s + o.total, 0);
+  const allTimeAvg = allTime.length ? allTimeRevenue / allTime.length : 0;
+
+  // ---------- Period totals ----------
+  const todayOrders = allTime.filter((o) => o.createdAt >= todayStart);
+  const weekOrders = allTime.filter((o) => o.createdAt >= weekStart);
+  const monthOrders = allTime.filter((o) => o.createdAt >= monthStart);
+
+  const periods = {
+    today: {
+      revenue: todayOrders.reduce((s, o) => s + o.total, 0),
+      orders: todayOrders.length,
+    },
+    week: {
+      revenue: weekOrders.reduce((s, o) => s + o.total, 0),
+      orders: weekOrders.length,
+    },
+    month: {
+      revenue: monthOrders.reduce((s, o) => s + o.total, 0),
+      orders: monthOrders.length,
+    },
+  };
+
+  // ---------- Daily revenue (last 7 days) ----------
+  const dailyMap = new Map<number, { revenue: number; orders: number; itemsSold: number }>();
+  for (let i = 6; i >= 0; i--) {
+    const day = startOfDay(now - i * 86_400_000);
+    dailyMap.set(day, { revenue: 0, orders: 0, itemsSold: 0 });
+  }
+  for (const o of allTime) {
+    const day = startOfDay(o.createdAt);
+    const bucket = dailyMap.get(day);
+    if (bucket) {
+      bucket.revenue += o.total;
+      bucket.orders += 1;
+      bucket.itemsSold += o.items.reduce((s, l) => s + l.qty, 0);
+    }
+  }
+  const dailyRevenue: DailyRevenue[] = [...dailyMap.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([ts, data]) => ({
+      date: dayLabel(ts),
+      timestamp: ts,
+      revenue: data.revenue,
+      orders: data.orders,
+      itemsSold: data.itemsSold,
+      avgOrderValue: data.orders ? data.revenue / data.orders : 0,
+    }));
+
+  // ---------- Status breakdown ----------
+  const statusMap = new Map<string, { count: number; revenue: number }>();
+  for (const o of allTime) {
+    const prev = statusMap.get(o.status) ?? { count: 0, revenue: 0 };
+    prev.count += 1;
+    prev.revenue += o.total;
+    statusMap.set(o.status, prev);
+  }
+  const statusBreakdown: StatusBreakdown[] = [...statusMap.entries()]
+    .map(([status, data]) => ({ status, ...data }))
+    .sort((a, b) => b.count - a.count);
+
+  // ---------- Top customers ----------
+  const customerMap = new Map<string, CustomerInsight>();
+  for (const o of allTime) {
+    const key = o.customerPhone ?? o.customerName ?? "unknown";
+    const prev = customerMap.get(key) ?? {
+      name: o.customerName ?? "Unknown",
+      phone: o.customerPhone ?? "",
+      orderCount: 0,
+      totalSpent: 0,
+      lastOrder: 0,
+    };
+    prev.orderCount += 1;
+    prev.totalSpent += o.total;
+    prev.lastOrder = Math.max(prev.lastOrder, o.createdAt);
+    customerMap.set(key, prev);
+  }
+  const topCustomers = [...customerMap.values()]
+    .sort((a, b) => b.orderCount - a.orderCount || b.totalSpent - a.totalSpent)
+    .slice(0, 10);
+
+  // ---------- Hourly distribution ----------
+  const hourCounts = new Array(24).fill(0) as number[];
+  for (const o of allTime) {
+    hourCounts[new Date(o.createdAt).getHours()] += 1;
+  }
+  const hourlyDistribution: HourlyDistribution[] = hourCounts.map((count, hour) => ({ hour, count }));
+
+  // ---------- Order type split ----------
+  const orderTypeSplit = {
+    delivery: allTime.filter((o) => o.orderType === "delivery").length,
+    pickup: allTime.filter((o) => o.orderType === "pickup").length,
+  };
+
+  return {
+    dailyRevenue,
+    allTime: { revenue: allTimeRevenue, orders: allTime.length, avgOrderValue: Math.round(allTimeAvg) },
+    periods,
+    statusBreakdown,
+    topCustomers,
+    hourlyDistribution,
+    orderTypeSplit,
   };
 }

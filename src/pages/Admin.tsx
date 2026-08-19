@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
   BadgeCheck,
+  BarChart3,
   CheckCircle2,
   Clock,
   Database,
@@ -68,6 +69,7 @@ import {
 } from "@/data/orders";
 import { computeOrderStats } from "@/lib/order-stats";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
+import AnalyticsTab from "@/components/admin/AnalyticsTab";
 
 type Product = Doc<"products">;
 type Order = Doc<"orders">;
@@ -1185,6 +1187,7 @@ function DatabaseTab() {
 /* ------------------------------------------------------------------ */
 const tabs = [
   { id: "orders", label: "Orders", icon: LayoutDashboard },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "products", label: "Products", icon: Package },
   { id: "staff", label: "Delivery Staff", icon: Users },
   { id: "database", label: "Database", icon: Database },
@@ -1245,6 +1248,17 @@ function AdminPanel() {
 
         <div className="mt-6">
           {tab === "orders" && <OrdersTab />}
+          {tab === "analytics" && (
+            <React.Suspense
+              fallback={
+                <div className="flex h-64 items-center justify-center">
+                  <Loader2 className="size-6 animate-spin text-maroon" />
+                </div>
+              }
+            >
+              <AnalyticsTab />
+            </React.Suspense>
+          )}
           {tab === "products" && <ProductsTab />}
           {tab === "staff" && <StaffTab />}
           {tab === "database" && <DatabaseTab />}
