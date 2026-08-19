@@ -12,6 +12,7 @@ import {
   Phone,
   Repeat,
   ShoppingBag,
+  Star,
   Truck,
   User,
   X,
@@ -45,6 +46,8 @@ import {
 } from "@/data/orders";
 import { generalOrderMessage, telLink, waLink } from "@/lib/whatsapp";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
+import { StarRating } from "@/components/StarRating";
+import { ReviewDialog } from "@/components/ReviewDialog";
 
 type Order = Doc<"orders">;
 
@@ -103,6 +106,10 @@ function OrderCard({ order }: { order: Order }) {
   const navigate = useNavigate();
   const [cancelling, setCancelling] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+
+  const isDelivered = order.status === "delivered";
+  const isRated = order.rating !== undefined;
 
   const itemsSummary = order.items
     .map((it) => `${it.qty} × ${it.name}`)
@@ -178,9 +185,35 @@ function OrderCard({ order }: { order: Order }) {
                 Waiting for the restaurant to confirm.
               </p>
             )}
+            {/* Rating display */}
+            {isDelivered && isRated && (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <StarRating value={order.rating!} readonly size="sm" />
+                  <span className="text-xs font-bold text-maroon">
+                    {order.rating}/5
+                  </span>
+                </div>
+                {order.review && (
+                  <p className="max-w-xs text-xs italic text-muted-foreground">
+                    "{order.review}"
+                  </p>
+                )}
+              </div>
+            )}
             {/* Actions */}
             <div className="flex flex-wrap gap-2">
-              {order.status === "delivered" && (
+              {isDelivered && !isRated && (
+                <Button
+                  size="sm"
+                  onClick={() => setShowReviewDialog(true)}
+                  className="bg-gold text-[#3a2403] hover:bg-gold-bright"
+                >
+                  <Star className="size-3.5" />
+                  Rate order
+                </Button>
+              )}
+              {isDelivered && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -206,6 +239,15 @@ function OrderCard({ order }: { order: Order }) {
           </div>
         </div>
       </article>
+
+      {/* Review dialog */}
+      {isDelivered && !isRated && (
+        <ReviewDialog
+          order={order}
+          open={showReviewDialog}
+          onOpenChange={setShowReviewDialog}
+        />
+      )}
 
       {/* Cancel confirmation dialog */}
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>

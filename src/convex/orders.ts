@@ -140,6 +140,48 @@ export const setStatus = mutation({
   },
 });
 
+export const rateOrder = mutation({
+  args: {
+    orderId: v.id("orders"),
+    rating: v.number(),
+    review: v.optional(v.string()),
+  },
+  handler: async (ctx, { orderId, rating, review }) => {
+    const user = await getSessionUser(ctx);
+    if (!user) throw new Error("Sign in to rate an order");
+
+    if (rating < 1 || rating > 5 || !Number.isInteger(rating)) {
+      throw new Error("Rating must be an integer between 1 and 5");
+    }
+
+    const order = await ctx.db.get(orderId);
+    if (!order) throw new Error("Order not found");
+
+    // Only the order owner can rate their own order.
+    if (order.userId !== user._id) {
+      throw new Error("You can only rate your own orders");
+    }
+
+    // Only delivered orders can be rated.
+    if (order.status !== "delivered") {
+      throw new Error("Only delivered orders can be rated");
+    }
+
+    // Prevent re-rating if already rated.
+    if (order.rating !== undefined) {
+      throw new Error("This order has already been rated");
+    }
+
+    await ctx.db.patch(orderId, {
+      rating,
+      review: (review ?? "").trim() || undefined,
+      reviewedAt: Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
 export const assignDelivery = mutation({
   args: {
     orderId: v.id("orders"),

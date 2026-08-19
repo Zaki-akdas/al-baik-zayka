@@ -20,6 +20,7 @@ import {
   Clock,
   IndianRupee,
   ShoppingBag,
+  Star,
   Truck,
   UtensilsCrossed,
 } from "lucide-react";
@@ -32,6 +33,7 @@ import {
   type AnalyticsData,
 } from "@/lib/order-stats";
 import { orderStatusLabels, type OrderStatus } from "@/data/orders";
+import { StarRating } from "@/components/StarRating";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -505,6 +507,47 @@ export default function AnalyticsTab() {
           </div>
         </div>
       </div>
+
+      {/* ---- Customer satisfaction ---- */}
+      {data.satisfaction.total > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <h3 className="mb-4 flex items-center gap-2 font-display text-lg uppercase tracking-wide">
+            <Star className="size-5 text-maroon fill-gold" />
+            Customer satisfaction
+            <span className="ml-auto text-xs font-normal normal-case text-muted-foreground">
+              {data.satisfaction.total} review{data.satisfaction.total !== 1 ? "s" : ""}
+            </span>
+          </h3>
+          <div className="grid gap-6 sm:grid-cols-[auto_1fr]">
+            {/* Big average score */}
+            <div className="flex flex-col items-center gap-1">
+              <p className="font-display text-5xl text-maroon">{data.satisfaction.average}</p>
+              <StarRating value={Math.round(data.satisfaction.average)} readonly size="md" />
+              <p className="text-[11px] text-muted-foreground">out of 5</p>
+            </div>
+            {/* Distribution bars */}
+            <div className="space-y-2">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = data.satisfaction.distribution[star] ?? 0;
+                const pct = data.satisfaction.total ? (count / data.satisfaction.total) * 100 : 0;
+                return (
+                  <div key={star} className="flex items-center gap-2">
+                    <span className="w-3 text-right text-xs font-bold text-foreground/70">{star}</span>
+                    <Star className="size-3.5 fill-gold text-gold" />
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-maroon to-gold transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="w-6 text-right text-xs font-bold text-muted-foreground">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

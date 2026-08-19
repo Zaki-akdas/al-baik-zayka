@@ -22,6 +22,8 @@ export interface OrderLike {
   orderType?: string;
   customerName?: string;
   customerPhone?: string;
+  rating?: number;
+  review?: string;
 }
 
 /**
@@ -165,6 +167,8 @@ export interface AnalyticsData {
   hourlyDistribution: HourlyDistribution[];
   /** Delivery vs pickup split. */
   orderTypeSplit: { delivery: number; pickup: number };
+  /** Customer satisfaction metrics. */
+  satisfaction: { average: number; total: number; distribution: Record<number, number> };
 }
 
 /** Format a timestamp to a short day label like "Mon 14". */
@@ -282,6 +286,16 @@ export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
     pickup: allTime.filter((o) => o.orderType === "pickup").length,
   };
 
+  // ---------- Satisfaction / ratings ----------
+  const ratedOrders = allTime.filter((o) => o.rating !== undefined);
+  const ratingSum = ratedOrders.reduce((s, o) => s + (o.rating ?? 0), 0);
+  const avgRating = ratedOrders.length ? Math.round((ratingSum / ratedOrders.length) * 10) / 10 : 0;
+  const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  for (const o of ratedOrders) {
+    if (o.rating) distribution[o.rating] += 1;
+  }
+  const satisfaction = { average: avgRating, total: ratedOrders.length, distribution };
+
   return {
     dailyRevenue,
     allTime: { revenue: allTimeRevenue, orders: allTime.length, avgOrderValue: Math.round(allTimeAvg) },
@@ -290,5 +304,6 @@ export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
     topCustomers,
     hourlyDistribution,
     orderTypeSplit,
+    satisfaction,
   };
 }

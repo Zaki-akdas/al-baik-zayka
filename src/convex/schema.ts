@@ -71,6 +71,12 @@ const schema = defineSchema(
       deliveryPersonId: v.optional(v.id("users")),
       notes: v.optional(v.string()),
       createdAt: v.number(),
+      /** Customer rating 1-5 after delivery (optional). */
+      rating: v.optional(v.number()),
+      /** Customer review text (optional). */
+      review: v.optional(v.string()),
+      /** When the rating was submitted. */
+      reviewedAt: v.optional(v.number()),
     })
       .index("by_user", ["userId"])
       .index("by_status", ["status"])

@@ -70,6 +70,7 @@ import {
 import { computeOrderStats } from "@/lib/order-stats";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
+import { StarRating } from "@/components/StarRating";
 
 type Product = Doc<"products">;
 type Order = Doc<"orders">;
@@ -449,6 +450,17 @@ function OrderCard({
           )}
           {order.notes && (
             <p className="text-muted-foreground">Note: {order.notes}</p>
+          )}
+          {order.rating !== undefined && (
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <StarRating value={order.rating} readonly size="sm" />
+                <span className="text-xs font-bold text-maroon">{order.rating}/5</span>
+              </div>
+              {order.review && (
+                <p className="text-xs italic text-muted-foreground">&ldquo;{order.review}&rdquo;</p>
+              )}
+            </div>
           )}
           <ul className="space-y-0.5 border-t border-border pt-2 text-foreground/70">
             {order.items.map((it, i) => (
