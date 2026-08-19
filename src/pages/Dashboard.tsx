@@ -48,6 +48,7 @@ import { generalOrderMessage, telLink, waLink } from "@/lib/whatsapp";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
 import { StarRating } from "@/components/StarRating";
 import { ReviewDialog } from "@/components/ReviewDialog";
+import SpendingSummary from "@/components/SpendingSummary";
 
 type Order = Doc<"orders">;
 
@@ -448,6 +449,21 @@ export default function Dashboard() {
         <section className="mt-10">
           <UserProfileCard />
         </section>
+
+        {/* Spending summary — only shown when there are orders */}
+        {orders && orders.length > 0 && (
+          <section className="mt-8">
+            <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
+              Your{" "}
+              <span className="font-script font-bold normal-case text-maroon">
+                stats
+              </span>
+            </h2>
+            <div className="mt-4">
+              <SpendingSummary />
+            </div>
+          </section>
+        )}
 
         {/* Notification opt-in */}
         <NotificationBanner />
