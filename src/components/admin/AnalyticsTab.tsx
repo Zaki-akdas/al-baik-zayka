@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import {
   BarChart,
@@ -15,6 +15,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
+  CalendarDays,
   TrendingUp,
   Users,
   Clock,
@@ -25,6 +26,9 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
 
 import { api } from "@/convex/_generated/api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -88,6 +92,32 @@ function ChartTooltip({
 }
 
 /* ------------------------------------------------------------------ */
+/* Date range presets                                                   */
+/* ------------------------------------------------------------------ */
+type PresetKey = "7d" | "30d" | "90d" | "all" | "custom";
+
+function daysAgo(n: number): number {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - n + 1);
+  return d.getTime();
+}
+
+function endOfToday(): number {
+  const d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d.getTime();
+}
+
+const PRESETS: { key: PresetKey; label: string; days?: number }[] = [
+  { key: "7d", label: "Last 7 days", days: 7 },
+  { key: "30d", label: "Last 30 days", days: 30 },
+  { key: "90d", label: "Last 90 days", days: 90 },
+  { key: "all", label: "All time" },
+  { key: "custom", label: "Custom" },
+];
+
+/* ------------------------------------------------------------------ */
 /* AnalyticsTab                                                        */
 /* ------------------------------------------------------------------ */
 export default function AnalyticsTab() {
@@ -95,9 +125,34 @@ export default function AnalyticsTab() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  const [preset, setPreset] = useState<PresetKey>("all");
+  const [customFrom, setCustomFrom] = useState<Date | undefined>();
+  const [customTo, setCustomTo] = useState<Date | undefined>();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectingEnd, setSelectingEnd] = useState(false);
+
+  // Build the date range for computeAnalytics
+  const dateRange = useMemo(() => {
+    if (preset === "all") return undefined;
+    if (preset === "custom" && customFrom && customTo) {
+      return { from: customFrom.getTime(), to: endOfToday() };
+    }
+    const p = PRESETS.find((p) => p.key === preset);
+    if (p?.days) return { from: daysAgo(p.days), to: endOfToday() };
+    return undefined;
+  }, [preset, customFrom, customTo]);
+
+  const rangeLabel = useMemo(() => {
+    if (preset === "custom" && customFrom && customTo) {
+      const fmt = (d: Date) => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+      return `${fmt(customFrom)} – ${fmt(customTo)}`;
+    }
+    return PRESETS.find((p) => p.key === preset)?.label ?? "All time";
+  }, [preset, customFrom, customTo]);
+
   const data: AnalyticsData | null = useMemo(
-    () => (orders ? computeAnalytics(orders) : null),
-    [orders],
+    () => (orders ? computeAnalytics(orders, dateRange) : null),
+    [orders, dateRange],
   );
 
   const textColor = isDark ? "#e5e7eb" : "#374151";
@@ -131,8 +186,94 @@ export default function AnalyticsTab() {
 
   const hasOrders = data.allTime.orders > 0;
 
+  const handleCalendarSelect = (range: { from?: Date; to?: Date } | undefined) => {
+    if (range?.from) {
+      setCustomFrom(range.from);
+      if (range.to) {
+        setCustomTo(range.to);
+        setPreset("custom");
+        setCalendarOpen(false);
+        setSelectingEnd(false);
+      } else {
+        setSelectingEnd(true);
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* ---- Date range picker ---- */}
+      <div className="flex flex-wrap items-center gap-2">
+        <CalendarDays className="size-4 text-maroon" />
+        {PRESETS.map((p) => (
+          <button
+            key={p.key}
+            type="button"
+            onClick={() => {
+              if (p.key === "custom") {
+                setCalendarOpen(true);
+                setCustomFrom(undefined);
+                setCustomTo(undefined);
+                setSelectingEnd(false);
+              } else {
+                setPreset(p.key);
+              }
+            }}
+            className={cn(
+              "shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors",
+              preset === p.key
+                ? "border-gold bg-gold text-[#3a2403]"
+                : "border-border bg-card text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {p.label}
+          </button>
+        ))}
+
+        {/* Custom date range popover */}
+        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+          <PopoverTrigger asChild>
+            <span />
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-auto p-0"
+            align="start"
+          >
+            <Calendar
+              mode="range"
+              numberOfMonths={2}
+              selected={customFrom && customTo ? { from: customFrom, to: customTo } : undefined}
+              onSelect={handleCalendarSelect}
+              disabled={{ after: new Date() }}
+            />
+            <div className="flex items-center justify-between border-t border-border px-4 py-2">
+              <p className="text-xs text-muted-foreground">
+                {selectingEnd ? "Select end date" : "Select start date"}
+              </p>
+              {customFrom && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setCustomFrom(undefined);
+                    setCustomTo(undefined);
+                    setSelectingEnd(false);
+                  }}
+                  className="h-7 text-xs text-muted-foreground"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Active range label */}
+        <span className="ml-auto text-xs text-muted-foreground">
+          {rangeLabel}
+        </span>
+      </div>
+
       {/* ---- Period KPI cards ---- */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard
@@ -170,7 +311,7 @@ export default function AnalyticsTab() {
             <TrendingUp className="size-5 text-maroon" />
             Revenue trend
             <span className="ml-auto text-xs font-normal normal-case text-muted-foreground">
-              last 7 days
+              {rangeLabel.toLowerCase()}
             </span>
           </h3>
           {hasOrders ? (
@@ -287,7 +428,7 @@ export default function AnalyticsTab() {
             <ShoppingBag className="size-5 text-maroon" />
             Orders per day
             <span className="ml-auto text-xs font-normal normal-case text-muted-foreground">
-              last 7 days
+              {rangeLabel.toLowerCase()}
             </span>
           </h3>
           {hasOrders ? (
@@ -499,7 +640,7 @@ export default function AnalyticsTab() {
             />
             <MiniStat
               icon={ShoppingBag}
-              label="Items sold (all time)"
+              label="Items sold"
               value={String(
                 data.dailyRevenue.reduce((s, d) => s + d.itemsSold, 0),
               )}

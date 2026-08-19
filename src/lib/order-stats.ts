@@ -184,7 +184,23 @@ function startOfDay(ts: number): number {
   return d.getTime();
 }
 
-export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
+export interface DateRange {
+  /** Start-of-day timestamp (inclusive). */
+  from: number;
+  /** End-of-day timestamp (inclusive — extended to 23:59:59). */
+  to: number;
+}
+
+/**
+ * Computes analytics from all orders. When a `range` is provided, the
+ * daily revenue chart, status breakdown, customers, hourly distribution,
+ * order type split and satisfaction are scoped to that range. Period KPIs
+ * (today / week / month) always reflect the full dataset.
+ */
+export function computeAnalytics(
+  orders: OrderLike[],
+  range?: { from: number; to: number },
+): AnalyticsData {
   const allTime = orders.filter((o) => o.status !== "cancelled");
   const now = Date.now();
   const todayStart = startOfToday();
@@ -202,26 +218,34 @@ export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
 
   const periods = {
     today: {
-      revenue: todayOrders.reduce((s, o) => s + o.total, 0),
+      revenue: todayOrders.reduce((s, o) => o.total + s, 0),
       orders: todayOrders.length,
     },
     week: {
-      revenue: weekOrders.reduce((s, o) => s + o.total, 0),
+      revenue: weekOrders.reduce((s, o) => o.total + s, 0),
       orders: weekOrders.length,
     },
     month: {
-      revenue: monthOrders.reduce((s, o) => s + o.total, 0),
+      revenue: monthOrders.reduce((s, o) => o.total + s, 0),
       orders: monthOrders.length,
     },
   };
 
-  // ---------- Daily revenue (last 7 days) ----------
+  // ---------- Scoped orders (within the selected date range) ----------
+  const scoped = range
+    ? allTime.filter((o) => o.createdAt >= range.from && o.createdAt <= range.to)
+    : allTime;
+
+  // ---------- Daily revenue (dynamic range) ----------
+  const rangeFrom = range?.from ?? (now - 6 * 86_400_000);
+  const rangeTo = range?.to ?? now;
+  const rangeDays = Math.max(1, Math.round((startOfDay(rangeTo) - startOfDay(rangeFrom)) / 86_400_000) + 1);
   const dailyMap = new Map<number, { revenue: number; orders: number; itemsSold: number }>();
-  for (let i = 6; i >= 0; i--) {
-    const day = startOfDay(now - i * 86_400_000);
+  for (let i = 0; i < rangeDays; i++) {
+    const day = startOfDay(rangeFrom + i * 86_400_000);
     dailyMap.set(day, { revenue: 0, orders: 0, itemsSold: 0 });
   }
-  for (const o of allTime) {
+  for (const o of scoped) {
     const day = startOfDay(o.createdAt);
     const bucket = dailyMap.get(day);
     if (bucket) {
@@ -241,9 +265,9 @@ export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
       avgOrderValue: data.orders ? data.revenue / data.orders : 0,
     }));
 
-  // ---------- Status breakdown ----------
+  // ---------- Status breakdown (scoped) ----------
   const statusMap = new Map<string, { count: number; revenue: number }>();
-  for (const o of allTime) {
+  for (const o of scoped) {
     const prev = statusMap.get(o.status) ?? { count: 0, revenue: 0 };
     prev.count += 1;
     prev.revenue += o.total;
@@ -253,9 +277,9 @@ export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
     .map(([status, data]) => ({ status, ...data }))
     .sort((a, b) => b.count - a.count);
 
-  // ---------- Top customers ----------
+  // ---------- Top customers (scoped) ----------
   const customerMap = new Map<string, CustomerInsight>();
-  for (const o of allTime) {
+  for (const o of scoped) {
     const key = o.customerPhone ?? o.customerName ?? "unknown";
     const prev = customerMap.get(key) ?? {
       name: o.customerName ?? "Unknown",
@@ -273,21 +297,21 @@ export function computeAnalytics(orders: OrderLike[]): AnalyticsData {
     .sort((a, b) => b.orderCount - a.orderCount || b.totalSpent - a.totalSpent)
     .slice(0, 10);
 
-  // ---------- Hourly distribution ----------
+  // ---------- Hourly distribution (scoped) ----------
   const hourCounts = new Array(24).fill(0) as number[];
-  for (const o of allTime) {
+  for (const o of scoped) {
     hourCounts[new Date(o.createdAt).getHours()] += 1;
   }
   const hourlyDistribution: HourlyDistribution[] = hourCounts.map((count, hour) => ({ hour, count }));
 
-  // ---------- Order type split ----------
+  // ---------- Order type split (scoped) ----------
   const orderTypeSplit = {
-    delivery: allTime.filter((o) => o.orderType === "delivery").length,
-    pickup: allTime.filter((o) => o.orderType === "pickup").length,
+    delivery: scoped.filter((o) => o.orderType === "delivery").length,
+    pickup: scoped.filter((o) => o.orderType === "pickup").length,
   };
 
-  // ---------- Satisfaction / ratings ----------
-  const ratedOrders = allTime.filter((o) => o.rating !== undefined);
+  // ---------- Satisfaction / ratings (scoped) ----------
+  const ratedOrders = scoped.filter((o) => o.rating !== undefined);
   const ratingSum = ratedOrders.reduce((s, o) => s + (o.rating ?? 0), 0);
   const avgRating = ratedOrders.length ? Math.round((ratingSum / ratedOrders.length) * 10) / 10 : 0;
   const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
