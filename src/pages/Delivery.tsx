@@ -14,6 +14,7 @@ import { listAssignedOrders, updateOrderStatus } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { PanelHeader } from "@/components/orders/PanelHeader";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { OrderItemClickable } from "@/components/OrderItemDialog";
 import { formatOrderId, formatOrderTime } from "@/data/orders";
 import { cn } from "@/lib/utils";
 
@@ -55,9 +56,7 @@ function DeliveryCard({ order, onRefresh }: { order: Order; onRefresh: () => voi
     }
   };
 
-  const itemsSummary = order.items
-    .map((it) => `${it.qty} × ${it.name}`)
-    .join(", ");
+
 
   return (
     <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -90,7 +89,17 @@ function DeliveryCard({ order, onRefresh }: { order: Order; onRefresh: () => voi
       </div>
 
       <div className="mt-3 rounded-xl border border-border bg-muted p-3 text-sm text-foreground/80">
-        <p className="leading-relaxed">{itemsSummary}</p>
+        <div className="space-y-0.5">
+          {order.items.map((it, i) => (
+            <OrderItemClickable
+              key={i}
+              name={it.name}
+              price={it.price}
+              qty={it.qty}
+              category={it.category}
+            />
+          ))}
+        </div>
         <p className="mt-2 font-display text-xl text-maroon">
           ₹{order.total}
           <span className="ml-2 text-xs font-sans font-medium text-muted-foreground">

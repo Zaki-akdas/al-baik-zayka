@@ -46,6 +46,7 @@ import { generalOrderMessage, telLink, waLink } from "@/lib/whatsapp";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
 import { StarRating } from "@/components/StarRating";
 import { ReviewDialog } from "@/components/ReviewDialog";
+import { OrderItemClickable } from "@/components/OrderItemDialog";
 import SpendingSummary from "@/components/SpendingSummary";
 import {
   listMyOrders,
@@ -164,7 +165,17 @@ function OrderCard({ order }: { order: Order }) {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="text-sm leading-relaxed text-muted-foreground">{itemsSummary}</p>
+            <div className="space-y-0.5">
+              {order.items.map((it, i) => (
+                <OrderItemClickable
+                  key={i}
+                  name={it.name}
+                  price={it.price}
+                  qty={it.qty}
+                  category={it.category}
+                />
+              ))}
+            </div>
             {order.order_type === "delivery" && order.address && (
               <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
                 <MapPin className="mt-0.5 size-3.5 shrink-0 text-maroon" />

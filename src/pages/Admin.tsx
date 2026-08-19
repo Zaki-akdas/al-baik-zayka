@@ -83,6 +83,7 @@ import { cn, friendlyErrorMessage } from "@/lib/utils";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
 import OffersTab from "@/components/admin/OffersTab";
 import { StarRating } from "@/components/StarRating";
+import { OrderItemClickable } from "@/components/OrderItemDialog";
 import { menuItems } from "@/data/menu";
 
 const fallbackImage =
@@ -372,18 +373,21 @@ function OrdersTab() {
                     {order.review && <p className="text-xs italic text-muted-foreground">&ldquo;{order.review}&rdquo;</p>}
                   </div>
                 )}
-                <ul className="space-y-0.5 border-t border-border pt-2 text-foreground/70">
+                <div className="space-y-0.5 border-t border-border pt-2">
                   {order.items.map((it, i) => (
-                    <li key={i} className="flex justify-between gap-3">
-                      <span>{it.qty} × {it.name}</span>
-                      <span className="shrink-0">₹{it.price * it.qty}</span>
-                    </li>
+                    <OrderItemClickable
+                      key={i}
+                      name={it.name}
+                      price={it.price}
+                      qty={it.qty}
+                      category={it.category}
+                    />
                   ))}
                   <li className="flex justify-between gap-3 border-t border-border pt-1.5 font-bold text-maroon">
                     <span>Total</span>
                     <span>₹{order.total}</span>
                   </li>
-                </ul>
+                </div>
               </div>
               <div className="space-y-3">
                 <div className="space-y-1.5">
