@@ -139,17 +139,17 @@ export default function Delivery() {
     <div className="min-h-screen bg-background text-foreground">
       <PanelHeader theme="light" />
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-maroon">
           Delivery dashboard
         </p>
-        <h1 className="mt-3 font-display text-5xl uppercase leading-[0.95] tracking-tight text-foreground sm:text-6xl">
+        <h1 className="mt-3 font-display text-4xl uppercase leading-[0.95] tracking-tight text-foreground sm:text-5xl md:text-6xl">
           Assigned{" "}
           <span className="font-script font-bold normal-case text-maroon">
             orders
           </span>
         </h1>
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
           Orders assigned to you by the restaurant, with one-tap status
           updates. Tap the phone number to call the customer.
         </p>

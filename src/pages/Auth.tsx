@@ -89,7 +89,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-8">
       <Card className="w-full max-w-md border-border shadow-md">
         <CardHeader className="text-center">
           <div className="flex justify-center">
@@ -169,7 +169,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
           <CardFooter className="flex flex-col gap-3 pb-6">
             <Button
               type="submit"
-              className="w-full bg-gold text-[#3a2403] hover:bg-gold-bright"
+              className="h-11 w-full bg-gold text-[#3a2403] hover:bg-gold-bright"
               disabled={isLoading}
             >
               {isLoading ? (

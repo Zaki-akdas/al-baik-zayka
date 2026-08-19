@@ -65,14 +65,14 @@ export default function NotFound() {
           className="max-w-lg text-center"
         >
           <motion.div variants={item}>
-            <span className="font-display text-[10rem] leading-none tracking-tight text-maroon/15 sm:text-[14rem]">
+            <span className="font-display text-[7rem] leading-none tracking-tight text-maroon/15 sm:text-[10rem] md:text-[14rem]">
               404
             </span>
           </motion.div>
 
           <motion.h1
             variants={item}
-            className="mt-[-2rem] font-display text-4xl uppercase tracking-wide sm:text-5xl"
+            className="mt-[-1rem] font-display text-3xl uppercase tracking-wide sm:mt-[-2rem] sm:text-4xl md:text-5xl"
           >
             Page not{" "}
             <span className="font-script font-bold normal-case text-maroon">
@@ -82,7 +82,7 @@ export default function NotFound() {
 
           <motion.p
             variants={item}
-            className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg"
+            className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg"
           >
             Looks like this page doesn't exist — maybe it was moved, or the link
             is outdated. Let's get you back on track.
@@ -92,35 +92,35 @@ export default function NotFound() {
             variants={item}
             className="mt-8 flex flex-wrap items-center justify-center gap-3"
           >
-            <Button size="lg" asChild className="h-12 px-7 text-base">
+            <Button size="sm" asChild className="h-10 px-5 text-sm sm:h-12 sm:px-7 sm:text-base">
               <Link to="/">
-                <Home className="size-5" />
+                <Home className="size-4 sm:size-5" />
                 Go to homepage
               </Link>
             </Button>
             <Button
-              size="lg"
+              size="sm"
               variant="outline"
               asChild
-              className="h-12 px-7 text-base"
+              className="h-10 px-5 text-sm sm:h-12 sm:px-7 sm:text-base"
             >
               <a
                 href={waLink(generalOrderMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <MessageCircle className="size-5" />
+                <MessageCircle className="size-4 sm:size-5" />
                 WhatsApp
               </a>
             </Button>
             <Button
-              size="lg"
+              size="sm"
               variant="outline"
               asChild
-              className="h-12 px-7 text-base"
+              className="h-10 px-5 text-sm sm:h-12 sm:px-7 sm:text-base"
             >
               <a href={telLink}>
-                <Phone className="size-5" />
+                <Phone className="size-4 sm:size-5" />
                 Call {restaurant.phone}
               </a>
             </Button>

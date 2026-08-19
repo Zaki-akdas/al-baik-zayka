@@ -151,7 +151,7 @@ export function Hero() {
           </div>
 
           {/* Floating delivery badge */}
-          <div className="animate-float absolute -top-4 -right-2 flex items-center gap-2 rounded-2xl border border-border bg-white/95 px-4 py-3 shadow-lg shadow-maroon/10 backdrop-blur-sm sm:-right-6">
+          <div className="animate-float absolute -top-4 right-2 hidden items-center gap-2 rounded-2xl border border-border bg-white/95 px-4 py-3 shadow-lg shadow-maroon/10 backdrop-blur-sm sm:flex sm:-right-6">
             <span className="flex size-9 items-center justify-center rounded-full bg-gold/20 text-maroon">
               <Truck className="size-5" />
             </span>
@@ -166,7 +166,7 @@ export function Hero() {
           </div>
 
           {/* Floating combo badge */}
-          <div className="animate-float-delayed absolute -bottom-5 -left-2 rounded-2xl border border-border bg-white/95 px-4 py-3 shadow-lg shadow-maroon/10 backdrop-blur-sm sm:-left-6">
+          <div className="animate-float-delayed absolute -bottom-5 left-2 hidden rounded-2xl border border-border bg-white/95 px-4 py-3 shadow-lg shadow-maroon/10 backdrop-blur-sm sm:block sm:-left-6">
             <span className="block font-display text-2xl uppercase leading-none text-maroon">
               Combo
             </span>

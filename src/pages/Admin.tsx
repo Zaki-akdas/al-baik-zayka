@@ -240,7 +240,7 @@ function OrdersTab() {
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="rounded-2xl border border-border bg-card p-4">
+            <div key={i} className="rounded-2xl border border-border bg-card p-3 sm:p-4">
               <Skeleton className="mb-2 h-3 w-28" />
               <Skeleton className="h-7 w-20" />
             </div>
@@ -337,7 +337,7 @@ function OrdersTab() {
         </div>
       ) : (
         filteredOrders.map((order) => (
-          <article key={order.id} className="rounded-2xl border border-border bg-card p-5">
+          <article key={order.id} className="rounded-2xl border border-border bg-card p-3 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <p className="font-display text-lg uppercase tracking-wide">
@@ -872,12 +872,12 @@ function AdminPanel() {
           </Button>
         }
       />
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-maroon">Admin panel</p>
-        <h1 className="mt-2 font-display text-4xl uppercase leading-[0.95] tracking-tight sm:text-5xl">
+        <h1 className="mt-2 font-display text-3xl uppercase leading-[0.95] tracking-tight sm:text-4xl md:text-5xl">
           Full <span className="font-script font-bold normal-case text-maroon">control</span>
         </h1>
-        <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
+        <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1 sm:mt-6 sm:gap-2">
           {tabs.map((t) => (
             <button key={t.id} type="button" onClick={() => setTab(t.id)} className={cn("flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors", tab === t.id ? "border-gold bg-gold text-[#3a2403]" : "border-border bg-card text-muted-foreground hover:text-foreground")}>
               <t.icon className="size-4" />

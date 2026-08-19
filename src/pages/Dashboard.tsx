@@ -140,7 +140,7 @@ function OrderCard({ order }: { order: Order }) {
 
   return (
     <>
-      <article className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <article className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="font-display text-lg uppercase tracking-wide text-foreground">
@@ -309,7 +309,7 @@ function UserProfileCard() {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-5">
       <div className="flex items-center gap-4">
         <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-maroon/10 font-display text-lg uppercase text-maroon">
           {user?.name
@@ -418,28 +418,28 @@ export default function Dashboard() {
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-maroon">
             My Orders
           </p>
-          <h1 className="mt-3 font-display text-5xl uppercase leading-[0.95] tracking-tight text-foreground sm:text-6xl">
+          <h1 className="mt-3 font-display text-4xl uppercase leading-[0.95] tracking-tight text-foreground sm:text-5xl md:text-6xl">
             Hey,{" "}
             <span className="font-script font-bold normal-case text-maroon">
               {firstName(user?.name, user?.email)}
             </span>
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
             Track your orders from the kitchen to your door. Hungry again? Head
             back to the menu.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Button size="lg" asChild className="h-12 bg-gold px-7 text-base font-bold text-[#3a2403] hover:bg-gold-bright">
+          <div className="mt-7 flex flex-wrap gap-2 sm:gap-3">
+            <Button size="sm" asChild className="h-10 px-5 text-sm font-bold sm:h-12 sm:px-7 sm:text-base">
               <Link to="/">
                 Order Now
-                <ArrowRight className="size-5" />
+                <ArrowRight className="size-4 sm:size-5" />
               </Link>
             </Button>
             <Button
-              size="lg"
+              size="sm"
               variant="outline"
               asChild
-              className="h-12 border-border px-7 text-base text-foreground/80 hover:bg-muted hover:text-foreground"
+              className="h-10 border-border px-5 text-sm text-foreground/80 hover:bg-muted hover:text-foreground sm:h-12 sm:px-7 sm:text-base"
             >
               <a href={waLink(generalOrderMessage)} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="size-5" />
@@ -468,12 +468,12 @@ export default function Dashboard() {
         {/* Spending summary — only shown when there are orders */}
         {orders && orders.length > 0 && (
           <section className="mt-8">
-            <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
-              Your{" "}
-              <span className="font-script font-bold normal-case text-maroon">
-                stats
-              </span>
-            </h2>
+          <h2 className="font-display text-xl uppercase tracking-wide text-foreground sm:text-2xl md:text-3xl">
+            Your{" "}
+            <span className="font-script font-bold normal-case text-maroon">
+              stats
+            </span>
+          </h2>
             <div className="mt-4">
               <SpendingSummary />
             </div>
@@ -485,7 +485,7 @@ export default function Dashboard() {
 
         {/* Orders */}
         <section className="mt-12">
-          <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
+          <h2 className="font-display text-xl uppercase tracking-wide text-foreground sm:text-2xl md:text-3xl">
             Your{" "}
             <span className="font-script font-bold normal-case text-maroon">
               orders
