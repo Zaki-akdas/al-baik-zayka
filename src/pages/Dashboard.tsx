@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, BellOff } from "lucide-react";
-import { useMutation, useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router";
 import {
   ArrowRight,
@@ -19,8 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { api } from "@/convex/_generated/api";
-import type { Doc } from "@/convex/_generated/dataModel";
+import type { Order } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -49,10 +47,13 @@ import { cn, friendlyErrorMessage } from "@/lib/utils";
 import { StarRating } from "@/components/StarRating";
 import { ReviewDialog } from "@/components/ReviewDialog";
 import SpendingSummary from "@/components/SpendingSummary";
+import {
+  listMyOrders,
+  updateOrderStatus,
+  rateOrder,
+} from "@/lib/db";
 
-type Order = Doc<"orders">;
-
-function firstName(name?: string, email?: string): string {
+function firstName(name?: string | null, email?: string | null): string {
   if (name) {
     const first = name.trim().split(/\s+/)[0];
     if (first) return first;
@@ -69,7 +70,7 @@ function OrderTimeline({ order }: { order: Order }) {
       </p>
     );
   }
-  const current = ORDER_STATUSES.indexOf(order.status);
+  const current = ORDER_STATUSES.indexOf(order.status as (typeof ORDER_STATUSES)[number]);
   return (
     <ol className="mt-4 space-y-1.5">
       {customerTimeline.map((step, i) => {
@@ -103,14 +104,12 @@ function OrderTimeline({ order }: { order: Order }) {
 
 function OrderCard({ order }: { order: Order }) {
   const { add, setIsOpen } = useCart();
-  const setStatus = useMutation(api.orders.setStatus);
-  const navigate = useNavigate();
   const [cancelling, setCancelling] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
 
   const isDelivered = order.status === "delivered";
-  const isRated = order.rating !== undefined;
+  const isRated = order.rating !== undefined && order.rating !== null;
 
   const itemsSummary = order.items
     .map((it) => `${it.qty} × ${it.name}`)
@@ -120,7 +119,7 @@ function OrderCard({ order }: { order: Order }) {
 
   const repeatOrder = () => {
     for (const item of order.items) {
-      add(item.productId ?? item.name, item.name, item.price, item.qty);
+      add(item.product_id ?? item.name, item.name, item.price, item.qty);
     }
     setIsOpen(true);
     toast("Items added to your cart");
@@ -129,7 +128,7 @@ function OrderCard({ order }: { order: Order }) {
   const cancelOrder = async () => {
     setCancelling(true);
     try {
-      await setStatus({ orderId: order._id, status: "cancelled" });
+      await updateOrderStatus(order.id, "cancelled");
       toast("Order cancelled");
       setShowCancelDialog(false);
     } catch (err) {
@@ -145,12 +144,12 @@ function OrderCard({ order }: { order: Order }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="font-display text-lg uppercase tracking-wide text-foreground">
-              {formatOrderId(order._id)}
+              {formatOrderId(order.id)}
             </p>
-            <p className="text-xs text-muted-foreground">{formatOrderTime(order.createdAt)}</p>
+            <p className="text-xs text-muted-foreground">{formatOrderTime(new Date(order.created_at).getTime())}</p>
           </div>
           <div className="flex items-center gap-2">
-            {order.orderType === "delivery" ? (
+            {order.order_type === "delivery" ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 <Truck className="size-3" /> Delivery
               </span>
@@ -159,14 +158,14 @@ function OrderCard({ order }: { order: Order }) {
                 <ShoppingBag className="size-3" /> Pickup
               </span>
             )}
-            <OrderStatusBadge status={order.status} theme="light" />
+            <OrderStatusBadge status={order.status as (typeof ORDER_STATUSES)[number]} theme="light" />
           </div>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
             <p className="text-sm leading-relaxed text-muted-foreground">{itemsSummary}</p>
-            {order.orderType === "delivery" && order.address && (
+            {order.order_type === "delivery" && order.address && (
               <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
                 <MapPin className="mt-0.5 size-3.5 shrink-0 text-maroon" />
                 {order.address}
@@ -197,7 +196,7 @@ function OrderCard({ order }: { order: Order }) {
                 </div>
                 {order.review && (
                   <p className="max-w-xs text-xs italic text-muted-foreground">
-                    "{order.review}"
+                    &ldquo;{order.review}&rdquo;
                   </p>
                 )}
               </div>
@@ -258,7 +257,7 @@ function OrderCard({ order }: { order: Order }) {
               Cancel order?
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              This will cancel order {formatOrderId(order._id)}. This action
+              This will cancel order {formatOrderId(order.id)}. This action
               cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -391,7 +390,23 @@ function NotificationBanner() {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const orders = useQuery(api.orders.myOrders);
+  const [orders, setOrders] = useState<Order[] | undefined>(undefined);
+
+  const refreshOrders = useCallback(async () => {
+    try {
+      const data = await listMyOrders();
+      setOrders(data);
+    } catch (err) {
+      console.error("Failed to load orders:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshOrders();
+    // Poll for order updates every 15 seconds
+    const interval = setInterval(refreshOrders, 15_000);
+    return () => clearInterval(interval);
+  }, [refreshOrders]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -521,7 +536,7 @@ export default function Dashboard() {
           ) : (
             <div className="mt-6 space-y-4">
               {orders.map((order) => (
-                <OrderCard key={order._id} order={order} />
+                <OrderCard key={order.id} order={order} />
               ))}
             </div>
           )}

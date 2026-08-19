@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
 import { Loader2, MessageSquarePlus } from "lucide-react";
 import { toast } from "sonner";
 
-import { api } from "@/convex/_generated/api";
-import type { Doc } from "@/convex/_generated/dataModel";
+import type { Order } from "@/lib/db";
+import { rateOrder } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -18,8 +17,6 @@ import {
 import { StarRating } from "@/components/StarRating";
 import { formatOrderId } from "@/data/orders";
 import { friendlyErrorMessage } from "@/lib/utils";
-
-type Order = Doc<"orders">;
 
 interface ReviewDialogProps {
   order: Order;
@@ -36,7 +33,6 @@ const ratingLabels: Record<number, string> = {
 };
 
 export function ReviewDialog({ order, open, onOpenChange }: ReviewDialogProps) {
-  const rateOrder = useMutation(api.orders.rateOrder);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -48,14 +44,9 @@ export function ReviewDialog({ order, open, onOpenChange }: ReviewDialogProps) {
     }
     setSubmitting(true);
     try {
-      await rateOrder({
-        orderId: order._id,
-        rating,
-        review: review.trim() || undefined,
-      });
+      await rateOrder(order.id, rating, review.trim() || undefined);
       toast("Thanks for your feedback!");
       onOpenChange(false);
-      // Reset
       setRating(0);
       setReview("");
     } catch (err) {
@@ -73,18 +64,13 @@ export function ReviewDialog({ order, open, onOpenChange }: ReviewDialogProps) {
             Rate your order
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            How was your experience with order {formatOrderId(order._id)}?
+            How was your experience with order {formatOrderId(order.id)}?
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 py-2">
-          {/* Star selector */}
           <div className="flex flex-col items-center gap-2">
-            <StarRating
-              value={rating}
-              onChange={setRating}
-              size="lg"
-            />
+            <StarRating value={rating} onChange={setRating} size="lg" />
             {rating > 0 && (
               <span className="text-sm font-semibold text-maroon">
                 {ratingLabels[rating]}
@@ -92,7 +78,6 @@ export function ReviewDialog({ order, open, onOpenChange }: ReviewDialogProps) {
             )}
           </div>
 
-          {/* Review text */}
           <div className="space-y-1.5">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Add a comment <span className="font-normal normal-case">(optional)</span>

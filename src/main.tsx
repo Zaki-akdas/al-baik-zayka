@@ -6,8 +6,6 @@ import { CartProvider } from "@/lib/cart";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ThemeProvider } from "next-themes";
 import { NotificationManager } from "@/components/NotificationManager";
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { ConvexReactClient } from "convex/react";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 // Self-hosted fonts (no Google Fonts CDN dependency — always load, even offline)
 import "@fontsource/anton";
@@ -34,7 +32,7 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 // Simple loading fallback for route transitions
 function RouteLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="animate-pulse text-muted-foreground">Loading...</div>
     </div>
   );
@@ -77,14 +75,14 @@ class RootErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-6">
+        <div className="flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
           <div className="max-w-lg text-center">
             <p className="text-sm font-semibold">Preview runtime error</p>
-            <p className="mt-2 text-xs text-muted-foreground break-words">
+            <p className="mt-2 break-words text-xs text-muted-foreground">
               {this.state.message}
             </p>
             {this.state.stack && (
-              <pre className="mt-3 text-left text-[10px] leading-4 text-muted-foreground/80 max-h-40 overflow-auto rounded border border-border/60 p-2">
+              <pre className="mt-3 max-h-40 overflow-auto rounded border border-border/60 p-2 text-left text-[10px] leading-4 text-muted-foreground/80">
                 {this.state.stack}
               </pre>
             )}
@@ -95,10 +93,6 @@ class RootErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-
 
 function RouteSyncer() {
   const location = useLocation();
@@ -123,7 +117,6 @@ function RouteSyncer() {
   return null;
 }
 
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RootErrorBoundary>
@@ -131,7 +124,6 @@ createRoot(document.getElementById("root")!).render(
         <VlyToolbar />
       </ToolbarErrorBoundary>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <ConvexAuthProvider client={convex}>
         <BrowserRouter>
           <ScrollToTop />
           <RouteSyncer />
@@ -167,7 +159,6 @@ createRoot(document.getElementById("root")!).render(
           </CartProvider>
         </BrowserRouter>
         <Toaster />
-      </ConvexAuthProvider>
       </ThemeProvider>
     </RootErrorBoundary>
   </StrictMode>,

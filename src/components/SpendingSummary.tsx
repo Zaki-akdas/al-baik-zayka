@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -16,31 +16,17 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useQuery } from "convex/react";
 
-import { api } from "@/convex/_generated/api";
-import type { Doc } from "@/convex/_generated/dataModel";
+import type { Order } from "@/lib/db";
+import { listMyOrders } from "@/lib/db";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
-type Order = Doc<"orders">;
-
-/* ------------------------------------------------------------------ */
-/* Helpers                                                             */
-/* ------------------------------------------------------------------ */
-function startOfMonth(ts: number): string {
-  const d = new Date(ts);
-  return d.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
-}
 
 function monthKey(ts: number): string {
   const d = new Date(ts);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-/* ------------------------------------------------------------------ */
-/* Custom tooltip                                                      */
-/* ------------------------------------------------------------------ */
 function ChartTooltip({
   active,
   payload,
@@ -61,13 +47,18 @@ function ChartTooltip({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* SpendingSummary                                                     */
-/* ------------------------------------------------------------------ */
 export default function SpendingSummary() {
-  const orders = useQuery(api.orders.myOrders);
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [loading, setLoading] = useState(true);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+
+  useEffect(() => {
+    listMyOrders()
+      .then(setOrders)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const stats = useMemo(() => {
     if (!orders || orders.length === 0) return null;
@@ -76,10 +67,8 @@ export default function SpendingSummary() {
     const totalSpent = delivered.reduce((s, o) => s + o.total, 0);
     const avgOrder = delivered.length ? Math.round(totalSpent / delivered.length) : 0;
 
-    // Member since (earliest order)
-    const earliest = Math.min(...orders.map((o) => o.createdAt));
+    const earliest = Math.min(...orders.map((o) => new Date(o.created_at).getTime()));
 
-    // Favorite items (top 5 by quantity)
     const itemMap = new Map<string, { name: string; qty: number; revenue: number }>();
     for (const o of delivered) {
       for (const item of o.items) {
@@ -93,11 +82,9 @@ export default function SpendingSummary() {
       .sort((a, b) => b.qty - a.qty)
       .slice(0, 5);
 
-    // Delivery vs pickup
-    const deliveryCount = delivered.filter((o) => o.orderType === "delivery").length;
-    const pickupCount = delivered.filter((o) => o.orderType === "pickup").length;
+    const deliveryCount = delivered.filter((o) => o.order_type === "delivery").length;
+    const pickupCount = delivered.filter((o) => o.order_type === "pickup").length;
 
-    // Monthly spending (last 6 months)
     const monthlyMap = new Map<string, { label: string; revenue: number; orders: number }>();
     const now = new Date();
     for (let i = 5; i >= 0; i--) {
@@ -110,7 +97,7 @@ export default function SpendingSummary() {
       });
     }
     for (const o of delivered) {
-      const key = monthKey(o.createdAt);
+      const key = monthKey(new Date(o.created_at).getTime());
       const bucket = monthlyMap.get(key);
       if (bucket) {
         bucket.revenue += o.total;
@@ -122,7 +109,6 @@ export default function SpendingSummary() {
       revenue: v.revenue,
     }));
 
-    // Active orders (not delivered/cancelled)
     const activeCount = orders.filter(
       (o) => o.status !== "delivered" && o.status !== "cancelled",
     ).length;
@@ -141,10 +127,8 @@ export default function SpendingSummary() {
   }, [orders]);
 
   const textColor = isDark ? "#e5e7eb" : "#374151";
-  const gridColor = isDark ? "#374151" : "#e5e7eb";
 
-  /* ---- Loading skeleton ---- */
-  if (orders === undefined) {
+  if (loading) {
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
@@ -157,43 +141,18 @@ export default function SpendingSummary() {
     );
   }
 
-  /* ---- Empty state ---- */
   if (!stats) return null;
 
   return (
     <div className="space-y-4">
-      {/* ---- KPI row ---- */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard
-          icon={IndianRupee}
-          label="Total spent"
-          value={`₹${stats.totalSpent.toLocaleString("en-IN")}`}
-          tone="gold"
-        />
-        <StatCard
-          icon={ShoppingBag}
-          label="Orders placed"
-          value={String(stats.totalOrders)}
-          hint={stats.activeCount > 0 ? `${stats.activeCount} active` : undefined}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Avg order"
-          value={`₹${stats.avgOrder}`}
-        />
-        <StatCard
-          icon={CalendarDays}
-          label="Member since"
-          value={new Date(stats.memberSince).toLocaleDateString(undefined, {
-            month: "short",
-            year: "numeric",
-          })}
-        />
+        <StatCard icon={IndianRupee} label="Total spent" value={`₹${stats.totalSpent.toLocaleString("en-IN")}`} tone="gold" />
+        <StatCard icon={ShoppingBag} label="Orders placed" value={String(stats.totalOrders)} hint={stats.activeCount > 0 ? `${stats.activeCount} active` : undefined} />
+        <StatCard icon={TrendingUp} label="Avg order" value={`₹${stats.avgOrder}`} />
+        <StatCard icon={CalendarDays} label="Member since" value={new Date(stats.memberSince).toLocaleDateString(undefined, { month: "short", year: "numeric" })} />
       </div>
 
-      {/* ---- Monthly spending chart + Favorites ---- */}
       <div className="grid gap-4 sm:grid-cols-2">
-        {/* Monthly spending chart */}
         {stats.monthlySpending.some((m) => m.revenue > 0) && (
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="mb-3 flex items-center gap-2 font-display text-sm uppercase tracking-wide">
@@ -202,32 +161,15 @@ export default function SpendingSummary() {
             </h3>
             <ResponsiveContainer width="100%" height={160}>
               <BarChart data={stats.monthlySpending}>
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: textColor, fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  tick={{ fill: textColor, fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v: number) => `₹${v}`}
-                  width={50}
-                />
+                <XAxis dataKey="name" tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fill: textColor, fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `₹${v}`} width={50} />
                 <Tooltip content={<ChartTooltip />} />
-                <Bar
-                  dataKey="revenue"
-                  fill="#65151b"
-                  radius={[4, 4, 0, 0]}
-                  name="Spent"
-                />
+                <Bar dataKey="revenue" fill="#65151b" radius={[4, 4, 0, 0]} name="Spent" />
               </BarChart>
             </ResponsiveContainer>
           </div>
         )}
 
-        {/* Favorite items */}
         {stats.favoriteItems.length > 0 && (
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="mb-3 flex items-center gap-2 font-display text-sm uppercase tracking-wide">
@@ -263,7 +205,6 @@ export default function SpendingSummary() {
           </div>
         )}
 
-        {/* Delivery vs pickup */}
         {(stats.deliveryCount + stats.pickupCount) > 0 && (
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="mb-3 flex items-center gap-2 font-display text-sm uppercase tracking-wide">
@@ -271,45 +212,27 @@ export default function SpendingSummary() {
               Delivery vs Pickup
             </h3>
             <div className="space-y-3">
-              {/* Delivery bar */}
               <div>
                 <div className="mb-1 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Delivery</span>
-                  <span className="font-bold text-foreground/70">
-                    {stats.deliveryCount} orders
-                  </span>
+                  <span className="font-bold text-foreground/70">{stats.deliveryCount} orders</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-maroon"
-                    style={{
-                      width: `${
-                        stats.deliveryCount + stats.pickupCount
-                          ? (stats.deliveryCount / (stats.deliveryCount + stats.pickupCount)) * 100
-                          : 0
-                      }%`,
-                    }}
+                    style={{ width: `${stats.deliveryCount + stats.pickupCount ? (stats.deliveryCount / (stats.deliveryCount + stats.pickupCount)) * 100 : 0}%` }}
                   />
                 </div>
               </div>
-              {/* Pickup bar */}
               <div>
                 <div className="mb-1 flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Pickup</span>
-                  <span className="font-bold text-foreground/70">
-                    {stats.pickupCount} orders
-                  </span>
+                  <span className="font-bold text-foreground/70">{stats.pickupCount} orders</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-gold"
-                    style={{
-                      width: `${
-                        stats.deliveryCount + stats.pickupCount
-                          ? (stats.pickupCount / (stats.deliveryCount + stats.pickupCount)) * 100
-                          : 0
-                      }%`,
-                    }}
+                    style={{ width: `${stats.deliveryCount + stats.pickupCount ? (stats.pickupCount / (stats.deliveryCount + stats.pickupCount)) * 100 : 0}%` }}
                   />
                 </div>
               </div>
@@ -321,34 +244,14 @@ export default function SpendingSummary() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* StatCard                                                            */
-/* ------------------------------------------------------------------ */
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  hint,
-  tone = "default",
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  hint?: string;
-  tone?: "default" | "gold";
-}) {
+function StatCard({ icon: Icon, label, value, hint, tone = "default" }: { icon: React.ElementType; label: string; value: string; hint?: string; tone?: "default" | "gold" }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
       <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         <Icon className="size-4 text-maroon" />
         {label}
       </div>
-      <p
-        className={cn(
-          "mt-2 font-display text-2xl tracking-wide",
-          tone === "gold" ? "text-maroon" : "text-foreground",
-        )}
-      >
+      <p className={cn("mt-2 font-display text-2xl tracking-wide", tone === "gold" ? "text-maroon" : "text-foreground")}>
         {value}
       </p>
       {hint && <p className="mt-1 text-[11px] text-muted-foreground">{hint}</p>}

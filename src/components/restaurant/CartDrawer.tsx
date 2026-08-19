@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useMutation } from "convex/react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -13,8 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
+import { placeOrder as dbPlaceOrder } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +27,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/lib/cart";
-import { useMenuItems } from "@/lib/menu-source";
+import { useMenu } from "@/lib/menu-source";
 import { cartOrderMessage, waLink } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
@@ -39,9 +37,8 @@ export function CartDrawer() {
   const { items, count, total, setQty, remove, clear, isOpen, setIsOpen } =
     useCart();
   const { user, isAuthenticated } = useAuth();
-  const { items: menuItems, fromDb } = useMenuItems();
+  const menuItems = useMenu();
   const navigate = useNavigate();
-  const placeOrder = useMutation(api.orders.placeOrder);
 
   const [view, setView] = useState<View>("cart");
   const [name, setName] = useState(user?.name ?? "");
@@ -52,13 +49,6 @@ export function CartDrawer() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [placedId, setPlacedId] = useState<string | null>(null);
-
-  const lines = items
-    .map((line) => ({
-      ...line,
-      item: menuItems.find((m) => m.id === line.id),
-    }))
-    .filter((line) => line.item !== undefined);
 
   const whatsappHref = waLink(cartOrderMessage(items));
 
@@ -78,18 +68,28 @@ export function CartDrawer() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await placeOrder({
-        items: items.map((l) => ({
-          productId: l.id as Id<"products">,
+      const orderItems = items.map((l) => {
+        const menuItem = menuItems.find((m) => m.id === l.id);
+        return {
+          product_id: l.id,
+          name: l.name,
+          category: menuItem?.category ?? "",
           qty: l.qty,
-        })),
-        customerName: name,
-        customerPhone: phone,
-        address,
-        orderType,
-        notes,
+          price: l.price,
+        };
       });
-      setPlacedId(res.orderId);
+
+      const res = await dbPlaceOrder({
+        customer_name: name,
+        customer_phone: phone,
+        address,
+        order_type: orderType,
+        items: orderItems,
+        total,
+        status: "placed",
+        notes: notes || null,
+      });
+      setPlacedId(res.id);
       clear();
       setView("done");
     } catch (err) {
@@ -131,7 +131,7 @@ export function CartDrawer() {
 
         {/* ---- Cart view ---- */}
         {view === "cart" &&
-          (lines.length === 0 ? (
+          (items.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
               <span className="flex size-16 items-center justify-center rounded-full bg-maroon/10 text-maroon">
                 <ShoppingBag className="size-7" />
@@ -146,197 +146,179 @@ export function CartDrawer() {
           ) : (
             <>
               <div className="flex-1 divide-y divide-border overflow-y-auto px-5">
-                {lines.map(({ id, name: lineName, qty, price, item }) => (
-                  <div key={id} className="flex items-center gap-3 py-4">
-                    <img
-                      src={item!.image}
-                      alt={lineName}
-                      loading="lazy"
-                      className="size-14 shrink-0 rounded-xl object-cover"
-                    />
+                {items.map((line) => (
+                  <div key={line.id} className="flex items-center gap-3 py-4">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">{lineName}</p>
+                      <p className="truncate text-sm font-medium">{line.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {fromDb ? `₹${price} each` : "Price on WhatsApp"}
+                        ₹{line.price} each
                       </p>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
-                        size="icon-sm"
+                        size="icon"
                         className="size-7"
-                        onClick={() => setQty(id, qty - 1)}
-                        aria-label={`Decrease ${lineName} quantity`}
+                        onClick={() => setQty(line.id, line.qty - 1)}
                       >
-                        <Minus className="size-3.5" />
+                        <Minus className="size-3" />
                       </Button>
-                      <span className="w-6 text-center text-sm font-bold" aria-live="polite">
-                        {qty}
+                      <span className="w-6 text-center text-sm font-bold">
+                        {line.qty}
                       </span>
                       <Button
                         variant="outline"
-                        size="icon-sm"
+                        size="icon"
                         className="size-7"
-                        onClick={() => setQty(id, qty + 1)}
-                        aria-label={`Increase ${lineName} quantity`}
+                        onClick={() => setQty(line.id, line.qty + 1)}
                       >
-                        <Plus className="size-3.5" />
+                        <Plus className="size-3" />
                       </Button>
                     </div>
+                    <p className="w-16 text-right text-sm font-bold">
+                      ₹{line.price * line.qty}
+                    </p>
                     <Button
                       variant="ghost"
-                      size="icon-sm"
-                      className="size-7 text-muted-foreground hover:text-destructive"
-                      onClick={() => remove(id)}
-                      aria-label={`Remove ${lineName}`}
+                      size="icon"
+                      className="size-7 text-muted-foreground hover:text-red-600"
+                      onClick={() => remove(line.id)}
                     >
                       <Trash2 className="size-3.5" />
                     </Button>
                   </div>
                 ))}
               </div>
-
-              <SheetFooter className="gap-3 border-t px-5 py-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Total</span>
-                  <span className="font-display text-lg">
-                    {fromDb ? `₹${total}` : "Confirmed on WhatsApp"}
-                  </span>
+              <SheetFooter className="border-t px-5 py-4">
+                <div className="flex w-full items-center justify-between">
+                  <p className="font-display text-2xl text-maroon">₹{total}</p>
+                  <div className="flex gap-2">
+                    <a
+                      href={whatsappHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground/80 hover:bg-muted"
+                    >
+                      <MessageCircle className="size-4" />
+                      WhatsApp
+                    </a>
+                    <Button
+                      className="bg-gold text-[#3a2403] hover:bg-gold-bright"
+                      onClick={startCheckout}
+                    >
+                      Checkout
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-                {fromDb ? (
-                  <Button
-                    size="lg"
-                    className="h-12 w-full text-base"
-                    onClick={startCheckout}
-                  >
-                    Place Order
-                    <ArrowRight className="size-5" />
-                  </Button>
-                ) : (
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    In-app ordering opens once the restaurant sets up the menu.
-                    Until then, order on WhatsApp.
-                  </p>
-                )}
-                <Button
-                  variant="outline"
-                  size="lg"
-                  asChild
-                  className="h-11 w-full border-green-600/40 text-green-700 hover:bg-green-600/10"
-                >
-                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="size-5" />
-                    Order on WhatsApp
-                  </a>
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="h-9 text-muted-foreground"
-                  onClick={clear}
-                >
-                  Clear order
-                </Button>
               </SheetFooter>
             </>
           ))}
 
         {/* ---- Checkout view ---- */}
         {view === "checkout" && (
-          <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-y-auto">
-            <div className="flex-1 space-y-4 px-5 py-5">
-              <div className="space-y-2">
-                <Label htmlFor="co-name">Your name</Label>
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
+            <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
+              <div className="space-y-1.5">
+                <Label className="text-foreground/80">Your name</Label>
                 <Input
-                  id="co-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Full name"
+                  placeholder="Name"
                   required
-                  autoComplete="name"
+                  className="border-border bg-background text-foreground"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="co-phone">Phone</Label>
+              <div className="space-y-1.5">
+                <Label className="text-foreground/80">Phone number</Label>
                 <Input
-                  id="co-phone"
-                  type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="10-digit mobile number"
+                  placeholder="+91 98765 43210"
                   required
-                  autoComplete="tel"
+                  className="border-border bg-background text-foreground"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Order type</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["delivery", "pickup"] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setOrderType(type)}
-                      className={cn(
-                        "flex h-11 items-center justify-center rounded-xl border text-sm font-semibold capitalize transition-colors",
-                        orderType === type
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-card text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      {type === "delivery" ? "🚚 Delivery" : "🏪 Pickup"}
-                    </button>
-                  ))}
+              <div className="space-y-1.5">
+                <Label className="text-foreground/80">Order type</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={orderType === "delivery" ? "default" : "outline"}
+                    onClick={() => setOrderType("delivery")}
+                    className={cn(
+                      "flex-1",
+                      orderType === "delivery"
+                        ? "bg-maroon text-cream"
+                        : "border-border text-foreground/80",
+                    )}
+                  >
+                    Delivery
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={orderType === "pickup" ? "default" : "outline"}
+                    onClick={() => setOrderType("pickup")}
+                    className={cn(
+                      "flex-1",
+                      orderType === "pickup"
+                        ? "bg-maroon text-cream"
+                        : "border-border text-foreground/80",
+                    )}
+                  >
+                    Pickup
+                  </Button>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="co-address">
-                  {orderType === "delivery" ? "Delivery address" : "Address (optional)"}
+              {orderType === "delivery" && (
+                <div className="space-y-1.5">
+                  <Label className="text-foreground/80">Delivery address</Label>
+                  <Textarea
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Full address for delivery"
+                    rows={2}
+                    required
+                    className="border-border bg-background text-foreground"
+                  />
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label className="text-foreground/80">
+                  Notes <span className="font-normal normal-case text-muted-foreground">(optional)</span>
                 </Label>
                 <Textarea
-                  id="co-address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder={
-                    orderType === "delivery"
-                      ? "House, street, landmark…"
-                      : "Landmark for pickup (optional)"
-                  }
-                  required={orderType === "delivery"}
-                  rows={3}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="co-notes">Notes (optional)</Label>
-                <Input
-                  id="co-notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Spice level, extras…"
+                  placeholder="Any special requests?"
+                  rows={2}
+                  className="border-border bg-background text-foreground"
                 />
               </div>
-              {error && (
-                <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {error}
-                </p>
-              )}
+              {error && <p className="text-sm text-red-500">{error}</p>}
             </div>
-            <SheetFooter className="gap-2 border-t px-5 py-4">
-              <Button
-                type="submit"
-                size="lg"
-                className="h-12 w-full text-base"
-                disabled={submitting}
-              >
-                {submitting ? "Placing order…" : `Pay ${fromDb ? `₹${total}` : ""} on delivery`}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="h-9 text-muted-foreground"
-                onClick={() => setView("cart")}
-                disabled={submitting}
-              >
-                Back to cart
-              </Button>
+            <SheetFooter className="border-t px-5 py-4">
+              <div className="flex w-full items-center justify-between">
+                <p className="font-display text-2xl text-maroon">₹{total}</p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setView("cart")}
+                    className="border-border text-foreground/80"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="bg-gold text-[#3a2403] hover:bg-gold-bright"
+                  >
+                    {submitting ? "Placing…" : "Place order"}
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
             </SheetFooter>
           </form>
         )}
@@ -344,41 +326,31 @@ export function CartDrawer() {
         {/* ---- Done view ---- */}
         {view === "done" && (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-            <span className="flex size-16 items-center justify-center rounded-full bg-green-600/10 text-green-600">
+            <span className="flex size-16 items-center justify-center rounded-full bg-green-100 text-green-600">
               <CheckCircle2 className="size-8" />
             </span>
-            <p className="font-display text-2xl uppercase tracking-wide">
-              Zayka on the way!
+            <p className="font-display text-xl uppercase tracking-wide">
+              Order placed!
             </p>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Order{" "}
-              <span className="font-semibold text-foreground">
-                #{placedId?.slice(-6).toUpperCase()}
-              </span>{" "}
-              is placed. The restaurant will confirm it — track its status
-              anytime from My Orders.
+            <p className="text-sm text-muted-foreground">
+              Your order has been sent to the kitchen. You can track it on your
+              dashboard.
             </p>
-            <div className="grid w-full gap-2">
+            <div className="flex gap-2">
               <Button
-                size="lg"
-                className="h-12 w-full text-base"
-                onClick={() => {
-                  setView("cart");
-                  setIsOpen(false);
-                  navigate("/dashboard");
-                }}
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                className="border-border text-foreground/80"
               >
-                Track my order
-                <ArrowRight className="size-5" />
+                Keep browsing
               </Button>
-              <Button variant="outline" onClick={browse}>
-                Continue browsing
+              <Button asChild className="bg-gold text-[#3a2403] hover:bg-gold-bright">
+                <a href="/dashboard">
+                  View order
+                  <ArrowRight className="size-4" />
+                </a>
               </Button>
             </div>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Phone className="size-3.5" />
-              Questions? Call the restaurant directly.
-            </p>
           </div>
         )}
       </SheetContent>

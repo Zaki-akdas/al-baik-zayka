@@ -1,55 +1,42 @@
-import { useEffect } from "react";
-import { useQuery } from "convex/react";
+import { useEffect, useRef } from "react";
+import { listMyOrders } from "@/lib/db";
+import type { Order } from "@/lib/db";
 
-import { api } from "@/convex/_generated/api";
-import { useNotifications } from "@/hooks/use-notifications";
-
-/**
- * Global component that monitors the user's orders and fires browser
- * notifications when an order's status changes. Placed in the app tree
- * once so every page benefits.
- */
 export function NotificationManager() {
-  const orders = useQuery(api.orders.myOrders);
-  const { checkOrderStatusChange, lastStatusRef, permission } =
-    useNotifications();
+  const prevStatusesRef = useRef<Map<string, string>>(new Map());
 
-  // Sync initial statuses into the ref without triggering notifications
   useEffect(() => {
-    if (!orders) return;
-    for (const order of orders) {
-      const id = order._id as string;
-      if (!lastStatusRef.current.has(id)) {
-        lastStatusRef.current.set(id, order.status);
+    const checkOrders = async () => {
+      try {
+        const orders = await listMyOrders();
+        for (const order of orders) {
+          const prevStatus = prevStatusesRef.current.get(order.id);
+          if (prevStatus && prevStatus !== order.status && order.status !== "cancelled") {
+            if ("Notification" in window && Notification.permission === "granted") {
+              const messages: Record<string, string> = {
+                confirmed: "Your order has been confirmed! 🎉",
+                preparing: "Your food is being prepared 👨‍🍳",
+                out_for_delivery: "Your order is on its way! 🚗",
+                delivered: "Your order has been delivered! Enjoy your meal 🍔",
+              };
+              const body = messages[order.status] ?? `Order status: ${order.status}`;
+              new Notification("Al-Baik Zayka", {
+                body,
+                icon: "/logo.svg",
+                tag: `order-${order.id}`,
+              });
+            }
+          }
+          prevStatusesRef.current.set(order.id, order.status);
+        }
+      } catch {
+        // Silently ignore polling errors
       }
-    }
-  }, [orders, lastStatusRef]);
+    };
 
-  // Detect status changes and fire notifications
-  useEffect(() => {
-    if (!orders || permission !== "granted") return;
-
-    for (const order of orders) {
-      const id = order._id as string;
-      const prev = lastStatusRef.current.get(id);
-
-      if (prev !== undefined && prev !== order.status) {
-        checkOrderStatusChange(id, prev, order.status);
-      }
-
-      lastStatusRef.current.set(id, order.status);
-    }
-  }, [orders, permission, checkOrderStatusChange, lastStatusRef]);
-
-  // Register the service worker for background notifications
-  useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
-
-    navigator.serviceWorker
-      .register("/sw.js")
-      .catch(() => {
-        // SW registration failed — notifications still work via the Notification API
-      });
+    // Check every 20 seconds
+    const interval = setInterval(checkOrders, 20_000);
+    return () => clearInterval(interval);
   }, []);
 
   return null;

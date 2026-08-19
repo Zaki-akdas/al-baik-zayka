@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Check,
   CookingPot,
@@ -10,15 +9,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { api } from "@/convex/_generated/api";
-import type { Doc } from "@/convex/_generated/dataModel";
+import type { Order } from "@/lib/db";
+import { listAssignedOrders, updateOrderStatus } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { PanelHeader } from "@/components/orders/PanelHeader";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { formatOrderId, formatOrderTime } from "@/data/orders";
 import { cn } from "@/lib/utils";
-
-type Order = Doc<"orders">;
 
 type NextStatus = "confirmed" | "preparing" | "out_for_delivery" | "delivered";
 
@@ -41,16 +38,16 @@ function nextAction(order: Order): {
   }
 }
 
-function DeliveryCard({ order }: { order: Order }) {
-  const setStatus = useMutation(api.orders.setStatus);
+function DeliveryCard({ order, onRefresh }: { order: Order; onRefresh: () => void }) {
   const [busy, setBusy] = useState(false);
   const action = nextAction(order);
 
   const update = async (next: NextStatus) => {
     setBusy(true);
     try {
-      await setStatus({ orderId: order._id, status: next });
-      toast(`Order ${formatOrderId(order._id)} updated`);
+      await updateOrderStatus(order.id, next);
+      toast(`Order ${formatOrderId(order.id)} updated`);
+      onRefresh();
     } catch (err) {
       toast(err instanceof Error ? err.message : "Could not update order");
     } finally {
@@ -67,23 +64,23 @@ function DeliveryCard({ order }: { order: Order }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="font-display text-lg uppercase tracking-wide text-foreground">
-            {formatOrderId(order._id)}
+            {formatOrderId(order.id)}
           </p>
-          <p className="text-xs text-muted-foreground">{formatOrderTime(order.createdAt)}</p>
+          <p className="text-xs text-muted-foreground">{formatOrderTime(new Date(order.created_at).getTime())}</p>
         </div>
-        <OrderStatusBadge status={order.status} theme="light" />
+        <OrderStatusBadge status={order.status as any} theme="light" />
       </div>
 
       <div className="mt-4 space-y-2 text-sm">
-        <p className="font-semibold text-foreground">{order.customerName}</p>
+        <p className="font-semibold text-foreground">{order.customer_name}</p>
         <a
-          href={`tel:${order.customerPhone}`}
+          href={`tel:${order.customer_phone}`}
           className="flex w-fit items-center gap-1.5 rounded-full border border-green-500/50 bg-green-100 px-3 py-1.5 font-bold text-green-800"
         >
           <Phone className="size-4" />
-          {order.customerPhone}
+          {order.customer_phone}
         </a>
-        {order.orderType === "delivery" && (
+        {order.order_type === "delivery" && (
           <p className="flex items-start gap-1.5 text-muted-foreground">
             <MapPin className="mt-0.5 size-4 shrink-0 text-maroon" />
             {order.address}
@@ -97,7 +94,7 @@ function DeliveryCard({ order }: { order: Order }) {
         <p className="mt-2 font-display text-xl text-maroon">
           ₹{order.total}
           <span className="ml-2 text-xs font-sans font-medium text-muted-foreground">
-            {order.orderType === "delivery" ? "Delivery" : "Pickup"}
+            {order.order_type === "delivery" ? "Delivery" : "Pickup"}
           </span>
         </p>
       </div>
@@ -122,7 +119,21 @@ function DeliveryCard({ order }: { order: Order }) {
 }
 
 export default function Delivery() {
-  const orders = useQuery(api.orders.myAssigned);
+  const [orders, setOrders] = useState<Order[] | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      setOrders(await listAssignedOrders());
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    const interval = setInterval(refresh, 15_000);
+    return () => clearInterval(interval);
+  }, [refresh]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -143,7 +154,7 @@ export default function Delivery() {
           updates. Tap the phone number to call the customer.
         </p>
 
-        {orders === undefined ? (
+        {orders === null ? (
           <p className="mt-8 text-sm text-muted-foreground">Loading your orders…</p>
         ) : orders.length === 0 ? (
           <div className="mt-8 flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-14 text-center shadow-sm">
@@ -159,7 +170,7 @@ export default function Delivery() {
         ) : (
           <div className="mt-8 space-y-4">
             {orders.map((order) => (
-              <DeliveryCard key={order._id} order={order} />
+              <DeliveryCard key={order.id} order={order} onRefresh={refresh} />
             ))}
           </div>
         )}

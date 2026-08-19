@@ -19,11 +19,11 @@ export interface OrderLike {
   status: string;
   total: number;
   items: OrderLine[];
-  orderType?: string;
-  customerName?: string;
-  customerPhone?: string;
-  rating?: number;
-  review?: string;
+  orderType?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  rating?: number | null;
+  review?: string | null;
 }
 
 /**

@@ -1,47 +1,52 @@
-import { useQuery } from "convex/react";
+import { useEffect, useMemo, useState } from "react";
+import { listProducts, type Product } from "@/lib/db";
+import { menuItems, type MenuItem, type MenuCategoryName } from "@/data/menu";
 
-import { api } from "@/convex/_generated/api";
-import type { Doc } from "@/convex/_generated/dataModel";
-import {
-  menuCategories,
-  menuItems as staticMenuItems,
-  type MenuItem,
-} from "@/data/menu";
+/**
+ * Returns the merged menu: Supabase products (if any) overlaid on the
+ * static fallback data. The admin-managed prices and availability from
+ * Supabase take precedence over the static defaults.
+ */
+export function useMenu(): MenuItem[] {
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
 
-type Product = Doc<"products">;
+  useEffect(() => {
+    listProducts()
+      .then(setDbProducts)
+      .catch(() => setDbProducts([]));
+  }, []);
 
-function toMenuItem(p: Product): MenuItem {
-  return {
-    id: p._id,
-    name: p.name,
-    category: p.category,
-    description: p.description,
-    price: p.price,
-    image: p.image,
-    isPopular: p.isPopular ?? false,
-    isOffer: p.isOffer ?? false,
-    isAvailable: p.isAvailable,
-    veg: p.veg ?? undefined,
-  };
+  if (dbProducts.length === 0) return menuItems;
+
+  const byName = new Map(
+    dbProducts.map((p) => [p.name.toLowerCase().trim(), p]),
+  );
+
+  return menuItems.map((item) => {
+    const db = byName.get(item.name.toLowerCase().trim());
+    return {
+      ...item,
+      price: db?.price ?? item.price,
+      isAvailable: db?.is_available ?? item.isAvailable,
+    };
+  });
 }
 
 /**
- * Menu items from the Convex products table (managed by the admin). Falls
- * back to the static starter menu until the restaurant imports/seeds
- * products — the site is never empty.
+ * Returns { items, categories, fromDb } — the old API that CartDrawer,
+ * FeaturedFood and MenuSection depend on.
  */
 export function useMenuItems() {
-  const products = useQuery(api.products.list);
-  const loading = products === undefined;
-  const fromDb = !!products && products.length > 0;
+  const items = useMenu();
+  const fromDb = useMemo(() => items.some((i) => i.price !== undefined), [items]);
 
-  const items: MenuItem[] = fromDb
-    ? products!.map(toMenuItem)
-    : staticMenuItems;
+  const categories = useMemo(() => {
+    const catSet = new Set<MenuCategoryName>();
+    for (const item of items) {
+      catSet.add(item.category);
+    }
+    return [...catSet];
+  }, [items]);
 
-  const categories: string[] = fromDb
-    ? [...new Set(items.map((i) => i.category))]
-    : [...menuCategories];
-
-  return { items, categories, loading, fromDb };
+  return { items, categories, fromDb };
 }

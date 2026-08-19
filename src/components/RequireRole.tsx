@@ -1,39 +1,46 @@
-import { useAuth } from "@/hooks/use-auth";
-import { Loader2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router";
+import { useAuth } from "@/hooks/use-auth";
+import { getRoleStatus } from "@/lib/db";
+import { Loader2 } from "lucide-react";
 
 interface RequireRoleProps {
   roles: string[];
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-/** Blocks signed-out users (to /auth) and users without an allowed role (to /dashboard). */
 export function RequireRole({ roles, children }: RequireRoleProps) {
-  const { isLoading, isAuthenticated, user } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
   const location = useLocation();
+  const [roleStatus, setRoleStatus] = useState<{ role: string | null } | null>(null);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isAuthenticated) {
+      getRoleStatus().then(setRoleStatus).catch(console.error);
+    }
+  }, [isAuthenticated]);
+
+  if (isLoading || (isAuthenticated && roleStatus === null)) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </main>
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-maroon" />
+      </div>
     );
   }
 
   if (!isAuthenticated) {
-    const returnTo = `${location.pathname}${location.search}`;
     return (
       <Navigate
-        to={`/auth?returnTo=${encodeURIComponent(returnTo)}`}
+        to={`/auth?returnTo=${encodeURIComponent(location.pathname)}`}
         replace
       />
     );
   }
 
-  if (!user?.role || !roles.includes(user.role)) {
+  const hasRole = roleStatus?.role && roles.includes(roleStatus.role);
+  if (!hasRole) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 }

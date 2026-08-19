@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useMutation } from "convex/react";
-
-import { api } from "@/convex/_generated/api";
 import type { MenuItem } from "@/data/menu";
 import { Navbar } from "@/components/restaurant/Navbar";
 import { Hero } from "@/components/restaurant/Hero";
@@ -59,12 +56,5 @@ function Site() {
 }
 
 export default function Landing() {
-  // Imports the starter menu into the products table once, so in-app
-  // ordering (and the admin panel) have real prices to work with.
-  const seed = useMutation(api.products.ensureSeeded);
-  useEffect(() => {
-    seed().catch(() => {});
-  }, [seed]);
-
   return <Site />;
 }
