@@ -46,7 +46,7 @@ export function FoodPreparation() {
                     <h3 className="font-display text-base uppercase leading-tight tracking-wide text-cream sm:text-lg">
                       {step.title}
                     </h3>
-                    <p className="mt-1 text-xs leading-snug text-white/70">
+                    <p className="mt-1 text-xs leading-snug text-cream/70">
                       {step.description}
                     </p>
                   </div>

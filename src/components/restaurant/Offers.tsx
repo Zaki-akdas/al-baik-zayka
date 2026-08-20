@@ -60,7 +60,7 @@ export function Offers() {
 
         <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Reveal className="lg:row-span-2">
-            <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/5 backdrop-blur-sm transition-colors duration-300 hover:border-gold/40">
+            <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card border-border transition-colors duration-300 hover:border-gold/40">
               <div className="relative aspect-[16/10] overflow-hidden">
                 <img
                   src={heroOffer.image}
@@ -76,15 +76,15 @@ export function Offers() {
                   <div className="absolute right-4 bottom-4 text-right">
                     <span className="font-display text-3xl text-gold-bright">₹{heroOffer.price}</span>
                     {heroOffer.originalPrice !== null && (
-                      <span className="ml-2 text-sm text-white/50 line-through">₹{heroOffer.originalPrice}</span>
+                      <span className="ml-2 text-sm text-muted-foreground line-through">₹{heroOffer.originalPrice}</span>
                     )}
                   </div>
                 )}
               </div>
               <div className="flex flex-1 flex-col p-6 sm:p-7">
                 <h3 className="font-display text-3xl uppercase tracking-wide sm:text-4xl">{heroOffer.title}</h3>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70 sm:text-base">{heroOffer.description}</p>
-                {heroOffer.validUntil && <p className="mt-2 text-xs text-white/40">Valid until {heroOffer.validUntil}</p>}
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-foreground/70 sm:text-base">{heroOffer.description}</p>
+                {heroOffer.validUntil && <p className="mt-2 text-xs text-muted-foreground">Valid until {heroOffer.validUntil}</p>}
                 <a
                   href={waLink(offerOrderMessage(heroOffer.title))}
                   target="_blank"
@@ -101,7 +101,7 @@ export function Offers() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             {rest.map((offer, i) => (
               <Reveal key={offer.id} delay={i * 0.08}>
-                <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/5 backdrop-blur-sm transition-colors duration-300 hover:border-gold/40">
+                <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card border-border transition-colors duration-300 hover:border-gold/40">
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <img
                       src={offer.image}
@@ -124,8 +124,8 @@ export function Offers() {
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="font-display text-xl uppercase tracking-wide">{offer.title}</h3>
-                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/65">{offer.description}</p>
-                    {offer.validUntil && <p className="mt-1 text-[11px] text-white/40">Valid until {offer.validUntil}</p>}
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-foreground/65">{offer.description}</p>
+                    {offer.validUntil && <p className="mt-1 text-[11px] text-muted-foreground">Valid until {offer.validUntil}</p>}
                     <a
                       href={waLink(offerOrderMessage(offer.title))}
                       target="_blank"
