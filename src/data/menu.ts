@@ -357,75 +357,75 @@ export const menuItems: MenuItem[] = [
   // ═══════════════════════════════════════════════════════════════════
   //  ABZ Specials
   // ═══════════════════════════════════════════════════════════════════
-  specials("ABZ Special Chicken Jumbo Twister", "Our signature jumbo twister loaded with special chicken filling and house sauces.", 150, I.jumboTwister, { isPopular: true }),
-  specials("ABZ Special Chicken Jumbo Shawarma", "Juicy jumbo shawarma packed with special chicken and zayka sauces.", 140, I.specialShawarma, { isPopular: true }),
-  specials("ABZ Special Chicken King Burger", "A towering king burger with our special chicken patty and bold flavours.", 130, I.kingBurger, { isPopular: true }),
-  specials("ABZ Special Chi. Jumbo Sandwich", "Jumbo sandwich overflowing with special chicken and signature fillings.", 140, I.jumboSandwich),
-  specials("ABZ Special Loded King Jumbo Sandwich", "A loaded king jumbo sandwich packed with chicken, cheese and sauces.", 200, I.loadedSandwich),
-  specials("ABZ Special Chicken Chesse Loded Pizza", "Loaded cheese pizza topped with special chicken and extra cheese.", 250, I.loaded),
-  specials("ABZ Special Chicken Chesse Pizza", "Classic cheese pizza with our special chicken topping.", 200, I.cheesePizza),
-  specials("ABZ Special Chicken Tocco", "Crispy chicken tocco with our signature spice blend.", 150, I.chickenTocco),
+  specials("ABZ Special Chicken Jumbo Twister", "Our signature jumbo twister loaded with special chicken filling and house sauces.", 150, "/Max_a_ABZ_Special_Chi._Jum.png", { isPopular: true }),
+  specials("ABZ Special Chicken Jumbo Shawarma", "Juicy jumbo shawarma packed with special chicken and zayka sauces.", 140, "/Max_a_ABZ_Special_Chicken_.png", { isPopular: true }),
+  specials("ABZ Special Chicken King Burger", "A towering king burger with our special chicken patty and bold flavours.", 130, "/Max_a_ABZ_Special_Chicken_ (1).png", { isPopular: true }),
+  specials("ABZ Special Chi. Jumbo Sandwich", "Jumbo sandwich overflowing with special chicken and signature fillings.", 140, "/Max_a_ABZ_Special_Chicken_ (2).png"),
+  specials("ABZ Special Loded King Jumbo Sandwich", "A loaded king jumbo sandwich packed with chicken, cheese and sauces.", 200, "/mai-image-2.5 (text-to-image)_a_ABZ_Special_Loded_Ki.png"),
+  specials("ABZ Special Chicken Chesse Loded Pizza", "Loaded cheese pizza topped with special chicken and extra cheese.", 250, "/Max_a_ABZ_Special_Chicken_ (3).png"),
+  specials("ABZ Special Chicken Chesse Pizza", "Classic cheese pizza with our special chicken topping.", 200, "/Max_a_ABZ_Special_Chicken_ (4).png"),
+  specials("ABZ Special Chicken Tocco", "Crispy chicken tocco with our signature spice blend.", 150, "/Max_a_Here_are_the_details.png"),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Cold Coffee
   // ═══════════════════════════════════════════════════════════════════
-  coldCoffee("Cold Coffee", 70, I.coldCoffee),
-  coldCoffee("Cold Coffee Thick Shake", 80, I.thickShake),
-  coldCoffee("Cold Coffee Thick Shake With Ice Cream", 100, I.iceCreamShake),
-  coldCoffee("Kitkat Shake", 100, I.kitkatShake, { isPopular: true }),
+  coldCoffee("Cold Coffee", 70, "/Max_a_Cold_Coffee_-_70_gen.png"),
+  coldCoffee("Cold Coffee Thick Shake", 80, "/Max_a_Cold_Coffee_Thick_Sh.png"),
+  coldCoffee("Cold Coffee Thick Shake With Ice Cream", 100, "/Max_a_Cold_Coffee_Thick_Sh (1).png"),
+  coldCoffee("Kitkat Shake", 100, "/Max_a_KitKat_Shake_-_100_g.png", { isPopular: true }),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Beverages & Desserts
   // ═══════════════════════════════════════════════════════════════════
-  bevDessert("Mojito", 80, "Refreshing mojito — cool, fizzy and full of flavour.", I.mojito),
-  bevDessert("Choco Lawa Cake", 80, "Rich chocolate lava cake — warm, gooey and irresistible.", I.chocoCake, false),
+  bevDessert("Mojito", 80, "Refreshing mojito — cool, fizzy and full of flavour.", "/Max_a_Cold_Coffee_-_70_gen.png"),
+  bevDessert("Choco Lawa Cake", 80, "Rich chocolate lava cake — warm, gooey and irresistible.", "/Max_a_Choco_Lawa_Cake_80_-.png", false),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Maggi
   // ═══════════════════════════════════════════════════════════════════
-  maggi("Plain Maggi", 60, "Classic plain Maggi — simple and satisfying.", I.plainMaggi),
-  maggi("Veg Maggi", 80, "Maggi loaded with fresh vegetables.", I.vegMaggi),
-  maggi("Veg Che Maggi", 120, "Vegetable Maggi topped with melted cheese.", I.vegMaggi),
-  maggi("Chicken Maggi", 120, "Maggi tossed with tender chicken pieces.", I.chickenMaggi, false),
-  maggi("Chicken che. Maggi", 150, "Chicken Maggi loaded with melted cheese.", I.chickenMaggi, false),
+  maggi("Plain Maggi", 60, "Classic plain Maggi — simple and satisfying.", "/Max_a_Plain_Maggi_-_60_gen.png"),
+  maggi("Veg Maggi", 80, "Maggi loaded with fresh vegetables.", "/Max_a_Veg_Maggi_-_80_gener.png"),
+  maggi("Veg Che Maggi", 120, "Vegetable Maggi topped with melted cheese.", "/Max_a_Veg_Che_Maggi_-_120_.png"),
+  maggi("Chicken Maggi", 120, "Maggi tossed with tender chicken pieces.", "/Max_a_Chicken_Maggi_-_120_.png", false),
+  maggi("Chicken che. Maggi", 150, "Chicken Maggi loaded with melted cheese.", "/Max_a_Chicken_che._Maggi_-.png", false),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Snacks & Fries
   // ═══════════════════════════════════════════════════════════════════
-  snack("Chicken Popcorn", 80, "Bite-sized crispy chicken popcorn — crunchy and addictive.", I.popcorn),
-  snack("Chicken Boneless", 100, "Juicy boneless chicken pieces, perfectly fried.", I.boneless),
-  snack("Chicken Hot Wings 4pcs", 80, "Fiery hot chicken wings — crispy on the outside, juicy inside.", I.hotWings),
-  snack("Chicken Lollipop 4pcs", 100, "Succulent chicken lollipops with a spicy glaze.", I.lollipop),
-  snack("Chicken Nuggets 10 Pcs", 120, "Golden crispy chicken nuggets — a crowd favourite.", I.nuggets),
-  snack("French Fries Salted", 70, "Crispy golden fries, lightly salted.", I.fries, true),
-  snack("Chet Masala Fries", 80, "Fries tossed in tangy chaat masala spice.", I.periFries, true),
-  snack("Peri Peri Fries", 80, "Golden fries tossed in fiery peri peri spice.", I.periFries, true, { isPopular: true }),
-  snack("VEG FRY MOMO's", 80, "Crispy fried vegetable momos with spicy dipping sauce.", I.momos, true),
+  snack("Chicken Popcorn", 80, "Bite-sized crispy chicken popcorn — crunchy and addictive.", "/Max_a_Chicken_Nuggets_10_P.png"),
+  snack("Chicken Boneless", 100, "Juicy boneless chicken pieces, perfectly fried.", "/Max_a_cocked_Chicken_Bonel.png"),
+  snack("Chicken Hot Wings 4pcs", 80, "Fiery hot chicken wings — crispy on the outside, juicy inside.", "/Max_a_Chicken_Hot_Wings_4p.png"),
+  snack("Chicken Lollipop 4pcs", 100, "Succulent chicken lollipops with a spicy glaze.", "/Max_a_Chicken_Lollipop_4pc.png"),
+  snack("Chicken Nuggets 10 Pcs", 120, "Golden crispy chicken nuggets — a crowd favourite.", "/Max_a_Chicken_Nuggets_10_P.png"),
+  snack("French Fries Salted", 70, "Crispy golden fries, lightly salted.", "/Max_a_French_Fries_Salted_.png", true),
+  snack("Chet Masala Fries", 80, "Fries tossed in tangy chaat masala spice.", "/a_Chet_Masala_Fries_-_.png", true),
+  snack("Peri Peri Fries", 80, "Golden fries tossed in fiery peri peri spice.", "/Max_a_Peri_Peri_Fries_-_80.png", true, { isPopular: true }),
+  snack("VEG FRY MOMO's", 80, "Crispy fried vegetable momos with spicy dipping sauce.", "/Max_a_VEG_FRY_MOMO'S_-_80_.png", true),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Tacco
   // ═══════════════════════════════════════════════════════════════════
-  tacco("Chicken Crunchy Tacco", 120, "Crunchy chicken taco with fresh toppings.", I.taco),
-  tacco("Chicken Crunchy Cheese Tacco", 130, "Crunchy chicken taco loaded with melted cheese.", I.cheeseTaco),
-  tacco("Chicken Crunchy Corn Cheese Tacco", 130, "Crunchy taco with chicken, corn and cheese.", I.cornTaco),
-  tacco("Chicken Crunchy Corn Cheese Double Tacco", 140, "Double-layered crunchy taco with chicken, corn and cheese.", I.cornTaco),
+  tacco("Chicken Crunchy Tacco", 120, "Crunchy chicken taco with fresh toppings.", "/Max_a_Chicken_Crunchy_Tacc.png"),
+  tacco("Chicken Crunchy Cheese Tacco", 130, "Crunchy chicken taco loaded with melted cheese.", "/Max_a_Chicken_Crunchy_Corn.png"),
+  tacco("Chicken Crunchy Corn Cheese Tacco", 130, "Crunchy taco with chicken, corn and cheese.", "/Max_a_Chicken_Crunchy_Corn (1).png"),
+  tacco("Chicken Crunchy Corn Cheese Double Tacco", 140, "Double-layered crunchy taco with chicken, corn and cheese.", "/Max_a_Chicken_Crunchy_Corn (1).png"),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Loaded
   // ═══════════════════════════════════════════════════════════════════
-  loaded("Mini Loaded", 100, "Mini loaded fries with cheese, sauces and toppings.", I.loaded, true),
+  loaded("Mini Loaded", 100, "Mini loaded fries with cheese, sauces and toppings.", "/Max_a_Peri_Peri_Fries_-_80.png", true),
   loaded("Loaded", 150, "Fully loaded fries with cheese, sauces and generous toppings.", I.loaded, true, { isPopular: true }),
-  loaded("Only Chicken Loaded", 200, "Loaded fries topped with extra chicken, cheese and zayka sauces.", I.chickenLoaded),
+  loaded("Only Chicken Loaded", 200, "Loaded fries topped with extra chicken, cheese and zayka sauces.", "/Max_a_Only_Chicken_Loaded_.png"),
 
   // ═══════════════════════════════════════════════════════════════════
   //  Twister Rolls
   // ═══════════════════════════════════════════════════════════════════
-  twister("Chicken Twister", 90, "Classic chicken twister — juicy chicken wrapped tight.", I.wrap),
-  twister("Chicken Cheese Twister", 100, "Chicken twister loaded with melted cheese.", I.wrap),
-  twister("Schezwan Chicken Twister", 100, "Spicy schezwan chicken twister with bold flavours.", I.wrap),
-  twister("Chicken Sch. Egg Roll Twister", 150, "Schezwan egg roll twister loaded with chicken.", I.eggWrap),
-  twister("Chicken Egg Roll Twister", 150, "Chicken and egg roll twister — a hearty classic.", I.eggWrap),
-  twister("Chi. Ch. Sch. Egg Roll Twister", 160, "Loaded chicken, schezwan and egg roll twister.", I.eggWrap),
+  twister("Chicken Twister", 90, "Classic chicken twister — juicy chicken wrapped tight.", "/Max_a_Chicken_Twister_-_90.png"),
+  twister("Chicken Cheese Twister", 100, "Chicken twister loaded with melted cheese.", "/a_Chicken_Cheese_Twist.png"),
+  twister("Schezwan Chicken Twister", 100, "Spicy schezwan chicken twister with bold flavours.", "/a_Schezwan_Chicken_Twi.png"),
+  twister("Chicken Sch. Egg Roll Twister", 150, "Schezwan egg roll twister loaded with chicken.", "/a_Chicken_Sch._Egg_Rol.png"),
+  twister("Chicken Egg Roll Twister", 150, "Chicken and egg roll twister — a hearty classic.", "/a_Chicken_Egg_Roll_Twi.png"),
+  twister("Chi. Ch. Sch. Egg Roll Twister", 160, "Loaded chicken, schezwan and egg roll twister.", "/a_Chicken_Egg_Roll_Twi.png"),
   twister("Veg Twister", 80, "Fresh veggie twister with crunchy vegetables.", I.vegWrap, true),
   twister("Veg Cheese Twister", 100, "Veggie twister topped with melted cheese.", I.vegWrap, true),
   twister("Veg Schezwan Twister", 100, "Spicy schezwan veggie twister.", I.vegWrap, true),
