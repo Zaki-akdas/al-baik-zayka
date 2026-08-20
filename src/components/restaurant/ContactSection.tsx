@@ -87,7 +87,7 @@ export function ContactSection() {
 
         {/* Big CTA row */}
         <Reveal className="mt-10">
-          <div className="flex flex-col items-center justify-between gap-5 rounded-3xl border border-border bg-gradient-to-r from-maroon/10 via-card to-gold/15 p-7 sm:p-8 lg:flex-row">
+          <div className="flex flex-col items-center justify-between gap-5 rounded-3xl border border-border bg-gradient-to-r from-maroon/10 via-card to-gold/15 p-5 sm:p-7 lg:p-8 lg:flex-row">
             <div>
               <h3 className="font-display text-2xl uppercase tracking-wide sm:text-3xl">
                 Hungry? Let's fix that.
@@ -97,8 +97,8 @@ export function ContactSection() {
                 delivery on WhatsApp.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button size="lg" asChild>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:gap-3">
+              <Button size="lg" asChild className="w-full sm:w-auto">
                 <a href={telLink}>
                   <Phone className="size-5" />
                   Call Now
@@ -107,7 +107,7 @@ export function ContactSection() {
               <Button
                 size="lg"
                 asChild
-                className="border-green-600/40 bg-green-600/10 text-green-700 hover:bg-green-600/20"
+                className="w-full border-green-600/40 bg-green-600/10 text-green-700 hover:bg-green-600/20 sm:w-auto"
               >
                 <a
                   href={waLink(generalOrderMessage)}
@@ -118,7 +118,7 @@ export function ContactSection() {
                   WhatsApp Order
                 </a>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                 <a
                   href={restaurant.instagramUrl}
                   target="_blank"
@@ -128,7 +128,7 @@ export function ContactSection() {
                   Instagram
                 </a>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                 <a
                   href={restaurant.mapsUrl}
                   target="_blank"

@@ -19,11 +19,11 @@ export function MobileOrderBar() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-background/95 backdrop-blur-md lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="mx-auto grid max-w-md grid-cols-3 gap-2 px-3 py-2.5">
+      <div className="mx-auto grid max-w-md grid-cols-3 gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 sm:py-2.5">
         <button
           type="button"
           onClick={orderNow}
-          className="relative flex h-12 items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
+          className="relative flex h-11 items-center justify-center gap-1.5 rounded-xl bg-primary text-xs font-semibold text-primary-foreground transition-transform active:scale-[0.98] sm:h-12 sm:gap-2 sm:text-sm"
         >
           <ShoppingBag className="size-5" />
           Order Now
@@ -37,14 +37,14 @@ export function MobileOrderBar() {
           href={waLink(generalOrderMessage)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-12 items-center justify-center gap-2 rounded-xl border border-green-600/40 bg-green-600/10 font-semibold text-green-700 transition-transform active:scale-[0.98]"
+          className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-green-600/40 bg-green-600/10 text-xs font-semibold text-green-700 transition-transform active:scale-[0.98] sm:h-12 sm:gap-2 sm:text-sm"
         >
           <MessageCircle className="size-5" />
           WhatsApp
         </a>
         <a
           href={telLink}
-          className="flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-card font-semibold text-foreground transition-transform active:scale-[0.98]"
+          className="flex h-11 items-center justify-center gap-1.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground transition-transform active:scale-[0.98] sm:h-12 sm:gap-2 sm:text-sm"
         >
           <Phone className="size-5" />
           Call
