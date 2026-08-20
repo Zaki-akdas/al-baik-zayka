@@ -4,7 +4,7 @@ import {
   PieChart, Pie, Cell, AreaChart, Area, CartesianGrid,
 } from "recharts";
 import {
-  CalendarDays, TrendingUp, Users, Clock, IndianRupee, ShoppingBag, Star, Truck, UtensilsCrossed,
+  CalendarDays, TrendingUp, Users, Clock, IndianRupee, ShoppingBag, Star, Truck, UtensilsCrossed, Flame,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -174,6 +174,46 @@ export default function AnalyticsTab() {
           </ResponsiveContainer>
         ) : <div className="flex h-56 items-center justify-center text-sm text-muted-foreground">No data</div>}
       </div>
+
+      {/* Top selling items */}
+      {data.topItems.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <h3 className="mb-4 flex items-center gap-2 font-display text-lg uppercase tracking-wide">
+            <Flame className="size-5 text-maroon" /> Top selling items
+          </h3>
+          <ol className="space-y-3">
+            {data.topItems.map((item, i) => {
+              const maxQty = data.topItems[0]?.qty ?? 1;
+              return (
+                <li key={item.name}>
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="flex min-w-0 items-center gap-2.5 text-foreground">
+                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-maroon/10 font-display text-xs text-maroon">
+                        {i + 1}
+                      </span>
+                      <span className="truncate font-medium">{item.name}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-3 text-xs">
+                      <span className="rounded-full border border-maroon/30 bg-maroon/10 px-2 py-0.5 font-bold text-maroon">
+                        {item.qty} sold
+                      </span>
+                      <span className="w-16 text-right font-semibold text-foreground/70">
+                        {String.fromCharCode(8377)}{item.revenue.toLocaleString("en-IN")}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-maroon to-gold"
+                      style={{ width: Math.round((item.qty / maxQty) * 100) + "%" }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
 
       {/* Top customers + Delivery vs Pickup */}
       <div className="grid gap-4 lg:grid-cols-3">

@@ -169,6 +169,8 @@ export interface AnalyticsData {
   orderTypeSplit: { delivery: number; pickup: number };
   /** Customer satisfaction metrics. */
   satisfaction: { average: number; total: number; distribution: Record<number, number> };
+  /** Top selling items by quantity (scoped to range). */
+  topItems: Array<{ name: string; qty: number; revenue: number }>;
 }
 
 /** Format a timestamp to a short day label like "Mon 14". */
@@ -320,6 +322,20 @@ export function computeAnalytics(
   }
   const satisfaction = { average: avgRating, total: ratedOrders.length, distribution };
 
+  // ---------- Top items by quantity (scoped) ----------
+  const itemMap = new Map<string, { name: string; qty: number; revenue: number }>();
+  for (const o of scoped) {
+    for (const line of o.items) {
+      const prev = itemMap.get(line.name) ?? { name: line.name, qty: 0, revenue: 0 };
+      prev.qty += line.qty;
+      prev.revenue += line.qty * line.price;
+      itemMap.set(line.name, prev);
+    }
+  }
+  const topItems = [...itemMap.values()]
+    .sort((a, b) => b.qty - a.qty || b.revenue - a.revenue)
+    .slice(0, 10);
+
   return {
     dailyRevenue,
     allTime: { revenue: allTimeRevenue, orders: allTime.length, avgOrderValue: Math.round(allTimeAvg) },
@@ -329,5 +345,6 @@ export function computeAnalytics(
     hourlyDistribution,
     orderTypeSplit,
     satisfaction,
+    topItems,
   };
 }
