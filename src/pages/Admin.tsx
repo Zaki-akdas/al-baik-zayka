@@ -81,6 +81,7 @@ import {
 import { computeOrderStats } from "@/lib/order-stats";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
+import { CategoryManager } from "@/components/admin/CategoryManager";
 import OffersTab from "@/components/admin/OffersTab";
 import { StarRating } from "@/components/StarRating";
 import { OrderItemClickable } from "@/components/OrderItemDialog";
@@ -864,6 +865,7 @@ const tabs = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "products", label: "Products", icon: Package },
   { id: "offers", label: "Offers", icon: Tag },
+  { id: "categories", label: "Categories", icon: Tag },
   { id: "staff", label: "Delivery Staff", icon: Users },
   { id: "database", label: "Database", icon: Database },
 ] as const;
@@ -900,6 +902,7 @@ function AdminPanel() {
           {tab === "analytics" && <AnalyticsTab />}
           {tab === "products" && <ProductsTab />}
           {tab === "offers" && <OffersTab />}
+          {tab === "categories" && <CategoryManager />}
           {tab === "staff" && <StaffTab />}
           {tab === "database" && <DatabaseTab />}
         </div>

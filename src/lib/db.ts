@@ -12,7 +12,11 @@ type OfferInsert = Database["public"]["Tables"]["offers"]["Insert"];
 type OfferUpdate = Database["public"]["Tables"]["offers"]["Update"];
 type User = Database["public"]["Tables"]["users"]["Row"];
 
-export type { Product, Order, Offer, User, OrderInsert };
+type Category = Database["public"]["Tables"]["categories"]["Row"];
+type CategoryInsert = Database["public"]["Tables"]["categories"]["Insert"];
+type CategoryUpdate = Database["public"]["Tables"]["categories"]["Update"];
+
+export type { Product, Order, Offer, User, Category, OrderInsert };
 
 /* ================================================================== */
 /* Auth helpers                                                        */
@@ -289,6 +293,60 @@ export async function getRoleStatus() {
     isDelivery: currentUser?.role === "delivery",
     adminExists: (count ?? 0) > 0,
   };
+}
+
+
+/* ================================================================== */
+/* Categories                                                           */
+/* ================================================================== */
+
+export async function listCategories(): Promise<Category[]> {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .order("sort_order");
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function createCategory(
+  cat: CategoryInsert,
+): Promise<Category> {
+  const { data, error } = await supabase
+    .from("categories")
+    .insert(cat)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateCategory(
+  id: string,
+  updates: CategoryUpdate,
+): Promise<void> {
+  const { error } = await supabase
+    .from("categories")
+    .update(updates)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  const { error } = await supabase.from("categories").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function reorderCategories(
+  orderedIds: string[],
+): Promise<void> {
+  for (let i = 0; i < orderedIds.length; i++) {
+    const { error } = await supabase
+      .from("categories")
+      .update({ sort_order: i })
+      .eq("id", orderedIds[i]);
+    if (error) throw error;
+  }
 }
 
 /* ================================================================== */

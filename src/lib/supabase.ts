@@ -161,6 +161,27 @@ export interface Database {
           reviewed_at?: string | null;
         };
       };
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          icon: string | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          icon?: string | null;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          icon?: string | null;
+          sort_order?: number;
+        };
+      };
       offers: {
         Row: {
           id: string;

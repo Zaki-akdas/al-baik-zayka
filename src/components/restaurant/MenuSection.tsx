@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { Leaf, Search, SearchX, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { categoryIcons, type MenuItem } from "@/data/menu";
+import type { MenuItem } from "@/data/menu";
 import { useMenuItems } from "@/lib/menu-source";
 import { cn } from "@/lib/utils";
 import { MenuCard } from "./MenuCard";
@@ -20,7 +20,7 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
   const [query, setQuery] = useState("");
   const [vegOnly, setVegOnly] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
-  const { items, categories, fromDb } = useMenuItems();
+  const { items, categories, categoryIcons, fromDb } = useMenuItems();
 
   const availableItems = fromDb
     ? items.filter((item) => item.isAvailable !== false)
@@ -101,7 +101,7 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
                   type="search"
                   value={query}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  placeholder="Search the menu…"
+                  placeholder="Search the menu..."
                   className="h-10 rounded-full pl-9 pr-9"
                   aria-label="Search the menu"
                 />

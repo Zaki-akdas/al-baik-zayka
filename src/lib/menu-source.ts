@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { listProducts, type Product } from "@/lib/db";
-import { menuItems, type MenuItem, type MenuCategoryName } from "@/data/menu";
+import { listProducts, listCategories, type Product, type Category } from "@/lib/db";
+import { menuItems, categoryIcons as staticIcons, type MenuItem, type MenuCategoryName } from "@/data/menu";
 
 /**
  * Returns the merged menu: Supabase products (if any) overlaid on the
@@ -34,20 +34,37 @@ export function useMenu(): MenuItem[] {
 }
 
 /**
- * Returns { items, categories, fromDb } — the old API that CartDrawer,
- * FeaturedFood and MenuSection depend on.
+ * Returns { items, categories, categoryIcons, fromDb } — the API that
+ * MenuSection and other components depend on.
  */
 export function useMenuItems() {
   const items = useMenu();
+  const [dbCategories, setDbCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    listCategories()
+      .then(setDbCategories)
+      .catch(() => setDbCategories([]));
+  }, []);
+
   const fromDb = useMemo(() => items.some((i) => i.price !== undefined), [items]);
 
-  const categories = useMemo(() => {
+  const { categories, categoryIcons } = useMemo(() => {
+    if (dbCategories.length > 0) {
+      const icons: Record<string, string> = {};
+      const cats = dbCategories.map((c) => {
+        if (c.icon) icons[c.name] = c.icon;
+        return c.name;
+      });
+      return { categories: cats, categoryIcons: icons };
+    }
+    // Fall back to extracting from items
     const catSet = new Set<MenuCategoryName>();
     for (const item of items) {
       catSet.add(item.category);
     }
-    return [...catSet];
-  }, [items]);
+    return { categories: [...catSet], categoryIcons: staticIcons };
+  }, [dbCategories, items]);
 
-  return { items, categories, fromDb };
+  return { items, categories, categoryIcons, fromDb };
 }
