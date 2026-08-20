@@ -3,6 +3,7 @@ import { restaurant } from "@/data/restaurant";
 export interface CartLine {
   id: string;
   name: string;
+  price: number;
   qty: number;
 }
 

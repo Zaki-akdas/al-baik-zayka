@@ -33,8 +33,8 @@ describe("order messages", () => {
 
   it("lists cart lines with quantities", () => {
     const msg = cartOrderMessage([
-      { id: "b1", name: "Zayka Special Burger", qty: 2 },
-      { id: "f1", name: "Loaded Fries", qty: 1 },
+      { id: "b1", name: "Zayka Special Burger", price: 129, qty: 2 },
+      { id: "f1", name: "Loaded Fries", price: 99, qty: 1 },
     ]);
     expect(msg).toContain("1. Zayka Special Burger × 2");
     expect(msg).toContain("2. Loaded Fries × 1");
