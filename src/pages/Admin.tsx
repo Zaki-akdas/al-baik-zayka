@@ -106,10 +106,10 @@ function AdminBootstrap() {
   const claim = async () => {
     setBusy(true);
     try {
-      const { getCurrentUser } = await import("@/lib/db");
-      const user = await getCurrentUser();
-      if (user) {
-        await setUserRole(user.id, "admin");
+      const { ensureUserProfile } = await import("@/lib/db");
+      const profile = await ensureUserProfile();
+      if (profile) {
+        await setUserRole(profile.id, "admin");
       }
       toast("You are now the admin!");
       window.location.reload();
