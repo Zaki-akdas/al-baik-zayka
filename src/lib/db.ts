@@ -271,8 +271,7 @@ export async function setUserRole(
 ): Promise<void> {
   const { error } = await supabase
     .from("users")
-    .update({ role })
-    .eq("id", userId);
+    .upsert({ id: userId, role }, { onConflict: "id" });
   if (error) throw error;
 }
 
