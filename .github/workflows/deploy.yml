@@ -7,19 +7,15 @@ on:
 
 concurrency:
   group: deploy-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  deploy-convex:
-    name: Deploy Convex functions
+  build-and-deploy:
+    name: Build & Deploy to Vercel
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      # Deployment keys from the Convex dashboard (Settings → Keys). Mapped to
-      # job env vars because secrets can't be referenced in `if:` conditions.
-      # Production deploys on pushes to main; preview deploys on pull requests.
-      CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-      CONVEX_PREVIEW_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -39,87 +35,17 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Deploy to Convex production
-        if: github.event_name == 'push' && env.CONVEX_DEPLOY_KEY != ''
-        run: npx convex deploy --message "Production deploy of ${{ github.sha }}"
-
-      - name: Deploy to Convex preview (pull request)
-        if: github.event_name == 'pull_request' && env.CONVEX_PREVIEW_DEPLOY_KEY != ''
-        env:
-          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
-        run: |
-          npx convex deploy \
-            --preview-name "${{ github.head_ref }}" \
-            --preview-run products:ensureSeeded \
-            --message "Preview deploy of ${{ github.sha }}"
-
-      - name: Skip Convex deploys (no deploy key secrets)
-        if: >
-          (github.event_name == 'push' && env.CONVEX_DEPLOY_KEY == '') ||
-          (github.event_name == 'pull_request' && env.CONVEX_PREVIEW_DEPLOY_KEY == '')
-        run: |
-          echo "::notice::Convex deploy skipped — add CONVEX_DEPLOY_KEY (production) and CONVEX_PREVIEW_DEPLOY_KEY (preview) repository secrets to enable it."
-
-  build-site:
-    name: Build production site
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Production build
         run: npm run build
-
-      - name: Upload site artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: site-dist
-          path: dist/
-          if-no-files-found: error
-
-  deploy-site:
-    name: Deploy site to Vercel
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: build-site
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-    env:
-      # Vercel token from Vercel dashboard (Account → Settings → Tokens). The
-      # org/project IDs come from the committed .vercel/project.json. Mapped to a
-      # job env var because secrets can't be referenced in `if:` conditions.
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Deploy to Vercel (production)
         if: github.event_name == 'push' && env.VERCEL_TOKEN != ''
         run: npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
 
-      - name: Deploy to Vercel preview (pull request)
+      - name: Deploy to Vercel (preview)
         if: github.event_name == 'pull_request' && env.VERCEL_TOKEN != ''
         run: npx vercel deploy --yes --token="$VERCEL_TOKEN"
 
-      - name: Skip Vercel deploy (no token)
+      - name: Skip deploy (no token)
         if: env.VERCEL_TOKEN == ''
-        run: |
-          echo "::notice::Vercel deploy skipped — add a VERCEL_TOKEN repository secret to enable it."
+        run: echo "::notice::Vercel deploy skipped — add VERCEL_TOKEN secret."
