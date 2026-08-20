@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import type { MenuItem } from "@/data/menu";
 import { useCart } from "@/lib/cart";
+import { cn } from "@/lib/utils";
+
+type Size = "half" | "full";
 
 interface ItemDialogProps {
   item: MenuItem | null;
@@ -21,21 +24,29 @@ interface ItemDialogProps {
 
 export function ItemDialog({ item, onClose }: ItemDialogProps) {
   const [qty, setQty] = useState(1);
+  const [size, setSize] = useState<Size>("full");
   const { add, setIsOpen } = useCart();
 
   if (!item) return null;
 
+  const hasHF = item.priceHalf != null;
+  const activePrice = hasHF && size === "half" ? item.priceHalf! : item.price ?? 0;
+  const cartId = hasHF ? `${item.id}--${size}` : item.id;
+  const cartName = hasHF ? `${item.name} (${size === "half" ? "Half" : "Full"})` : item.name;
+
   const handleAdd = () => {
-    add(item.id, item.name, item.price ?? 0, qty);
-    toast(`${item.name} × ${qty} added to your order`);
+    add(cartId, cartName, activePrice, qty);
+    toast(`${cartName} × ${qty} added to your order`);
     onClose();
     setQty(1);
+    setSize("full");
   };
 
   const handleOrderNow = () => {
-    add(item.id, item.name, item.price ?? 0, qty);
+    add(cartId, cartName, activePrice, qty);
     onClose();
     setQty(1);
+    setSize("full");
     setIsOpen(true);
   };
 
@@ -72,7 +83,7 @@ export function ItemDialog({ item, onClose }: ItemDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center gap-4 px-5 pt-4">
+        <div className="flex items-center gap-3 px-5 pt-4 flex-wrap">
           {item.veg !== undefined && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground/80">
               {item.veg ? (
@@ -83,9 +94,42 @@ export function ItemDialog({ item, onClose }: ItemDialogProps) {
               {item.veg ? "Vegetarian" : "Non-vegetarian"}
             </span>
           )}
-          <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground/80">
-            {item.price !== null ? `₹${item.price}` : "Price to be updated"}
-          </span>
+
+          {/* Half / Full toggle */}
+          {hasHF ? (
+            <div className="flex items-center gap-2">
+              <div className="flex overflow-hidden rounded-full border border-border text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSize("half")}
+                  className={cn(
+                    "px-3 py-1 transition-colors",
+                    size === "half"
+                      ? "bg-maroon text-white"
+                      : "bg-card text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Half ₹{item.priceHalf}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSize("full")}
+                  className={cn(
+                    "px-3 py-1 transition-colors",
+                    size === "full"
+                      ? "bg-maroon text-white"
+                      : "bg-card text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  Full ₹{item.price}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-foreground/80">
+              {item.price !== null ? `₹${item.price}` : "Price to be updated"}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-4 px-5 py-5">

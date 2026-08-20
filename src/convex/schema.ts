@@ -41,6 +41,7 @@ const schema = defineSchema(
       category: v.string(),
       description: v.string(),
       price: v.number(), // ₹
+      priceHalf: v.optional(v.number()), // ₹ half-size price for H/F items
       image: v.string(),
       isAvailable: v.boolean(),
       isPopular: v.optional(v.boolean()),

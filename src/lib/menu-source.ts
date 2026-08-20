@@ -17,6 +17,7 @@ function toMenuItem(p: Product): MenuItem {
     category: p.category,
     description: p.description,
     price: p.price,
+    priceHalf: (p as Record<string, unknown>).priceHalf as number | undefined,
     image: p.image,
     isPopular: p.isPopular ?? false,
     isOffer: p.isOffer ?? false,
