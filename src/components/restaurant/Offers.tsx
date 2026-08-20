@@ -60,7 +60,7 @@ export function Offers() {
 
         <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Reveal className="lg:row-span-2">
-            <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm transition-colors duration-300 hover:border-gold/40">
+            <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/5 backdrop-blur-sm transition-colors duration-300 hover:border-gold/40">
               <div className="relative aspect-[16/10] overflow-hidden">
                 <img
                   src={heroOffer.image}
@@ -101,7 +101,7 @@ export function Offers() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             {rest.map((offer, i) => (
               <Reveal key={offer.id} delay={i * 0.08}>
-                <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm transition-colors duration-300 hover:border-gold/40">
+                <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card/5 backdrop-blur-sm transition-colors duration-300 hover:border-gold/40">
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <img
                       src={offer.image}
@@ -113,7 +113,7 @@ export function Offers() {
                     <Badge
                       className={cn(
                         "absolute top-3 left-3 border-transparent text-[10px] font-extrabold tracking-widest",
-                        offer.badge === "TODAY'S SPECIAL" ? "bg-gold text-[#3a2403]" : "bg-white/90 text-maroon",
+                        offer.badge === "TODAY'S SPECIAL" ? "bg-gold text-[#3a2403]" : "bg-card/90 text-maroon",
                       )}
                     >
                       {offer.badge}

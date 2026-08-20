@@ -33,7 +33,7 @@ export function FoodPreparation() {
                   <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-night/20 to-transparent" />
 
                   {step.videoUrl && (
-                    <span className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-white/90 text-maroon shadow">
+                    <span className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-card/90 text-maroon shadow">
                       <Play className="size-4 fill-current" />
                     </span>
                   )}

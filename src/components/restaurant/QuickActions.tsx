@@ -54,7 +54,7 @@ export function QuickActions() {
                   scroll(action.href);
                 }
               }}
-              className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-maroon/25 hover:bg-white hover:shadow-lg hover:shadow-maroon/10"
+              className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-maroon/25 hover:bg-card hover:shadow-lg hover:shadow-maroon/10"
             >
               <span className="flex size-11 items-center justify-center rounded-xl bg-maroon/10 text-maroon transition-colors group-hover:bg-maroon group-hover:text-primary-foreground">
                 <action.icon className="size-5" />

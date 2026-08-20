@@ -51,7 +51,7 @@ export function OrderItemDialog({
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             {veg !== undefined && (
               <span className="absolute top-3 left-3">
-                <Badge className="border-transparent bg-white/90 text-[10px] font-extrabold tracking-wider text-maroon">
+                <Badge className="border-transparent bg-card/90 text-[10px] font-extrabold tracking-wider text-maroon">
                   {veg ? "VEG" : "NON-VEG"}
                 </Badge>
               </span>

@@ -67,7 +67,7 @@ export function ItemDialog({ item, onClose }: ItemDialogProps) {
               </Badge>
             )}
             {item.isOffer && (
-              <Badge className="border-transparent bg-white/90 text-[10px] font-extrabold tracking-wider text-maroon">
+              <Badge className="border-transparent bg-card/90 text-[10px] font-extrabold tracking-wider text-maroon">
                 COMBO
               </Badge>
             )}

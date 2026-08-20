@@ -64,7 +64,7 @@ export function MenuCard({ item, onOpen }: MenuCardProps) {
             </Badge>
           )}
           {item.isOffer && (
-            <Badge className="border-transparent bg-white/90 text-[10px] font-extrabold tracking-wider text-maroon backdrop-blur-sm">
+            <Badge className="border-transparent bg-card/90 text-[10px] font-extrabold tracking-wider text-maroon backdrop-blur-sm">
               COMBO
             </Badge>
           )}
