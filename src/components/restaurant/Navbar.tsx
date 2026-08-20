@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { LogoBadge } from "@/components/restaurant/LogoBadge";
-import { navLinks } from "@/data/restaurant";
+import { navLinks, restaurant } from "@/data/restaurant";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/lib/cart";
 import { telLink, waLink, generalOrderMessage } from "@/lib/whatsapp";
@@ -98,6 +98,14 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
+          <a
+            href={telLink}
+            className="hidden items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground/70 transition-colors hover:border-maroon/30 hover:text-maroon md:inline-flex"
+            aria-label={`Call ${restaurant.phone}`}
+          >
+            <Phone className="size-3.5" />
+            {restaurant.phone}
+          </a>
           <Button
             variant="ghost"
             size="icon"
