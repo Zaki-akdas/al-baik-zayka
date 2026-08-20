@@ -26,6 +26,7 @@ import {
   ShoppingBag,
   Tag,
   Trash2,
+  Truck,
   Users,
   UtensilsCrossed,
   XCircle,
@@ -83,6 +84,7 @@ import { cn, friendlyErrorMessage } from "@/lib/utils";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
 import { CategoryManager } from "@/components/admin/CategoryManager";
 import ProductsManager from "@/components/admin/ProductsManager";
+import DeliveryDashboard from "@/components/admin/DeliveryDashboard";
 import OffersTab from "@/components/admin/OffersTab";
 import { StarRating } from "@/components/StarRating";
 import { OrderItemClickable } from "@/components/OrderItemDialog";
@@ -867,7 +869,8 @@ const tabs = [
   { id: "products", label: "Products", icon: Package },
   { id: "offers", label: "Offers", icon: Tag },
   { id: "categories", label: "Categories", icon: Tag },
-  { id: "staff", label: "Delivery Staff", icon: Users },
+  { id: "delivery", label: "Delivery", icon: Truck },
+  { id: "staff", label: "Staff", icon: Users },
   { id: "database", label: "Database", icon: Database },
 ] as const;
 
@@ -904,6 +907,7 @@ function AdminPanel() {
           {tab === "products" && <ProductsManager />}
           {tab === "offers" && <OffersTab />}
           {tab === "categories" && <CategoryManager />}
+          {tab === "delivery" && <DeliveryDashboard />}
           {tab === "staff" && <StaffTab />}
           {tab === "database" && <DatabaseTab />}
         </div>
