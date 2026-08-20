@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { BadgeCheck, Info, Plus, Leaf } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { MenuItem } from "@/data/menu";
 import { useCart } from "@/lib/cart";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface MenuCardProps {
@@ -11,13 +13,26 @@ interface MenuCardProps {
   onOpen: (item: MenuItem) => void;
 }
 
+type Size = "half" | "full";
+
 export function MenuCard({ item, onOpen }: MenuCardProps) {
   const { add } = useCart();
+  const [size, setSize] = useState<Size>("full");
+
+  const hasHF = item.priceHalf != null;
+  const activePrice = hasHF && size === "half" ? item.priceHalf! : item.price ?? 0;
+  const cartId = hasHF ? `${item.id}--${size}` : item.id;
+  const cartName = hasHF ? `${item.name} (${size === "half" ? "Half" : "Full"})` : item.name;
 
   const quickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
-    add(item.id, item.name, item.price ?? 0, 1);
-    toast(`${item.name} added to your order`);
+    add(cartId, cartName, activePrice, 1);
+    toast(`${cartName} added to your order`);
+  };
+
+  const handleSizeToggle = (e: React.MouseEvent, s: Size) => {
+    e.stopPropagation();
+    setSize(s);
   };
 
   return (
@@ -80,7 +95,39 @@ export function MenuCard({ item, onOpen }: MenuCardProps) {
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-4">
           <div>
-            {item.price !== null ? (
+            {hasHF ? (
+              <div className="flex items-center gap-1.5">
+                <span className="font-display text-2xl leading-none text-maroon">
+                  ₹{activePrice}
+                </span>
+                <div className="ml-1 flex overflow-hidden rounded-full border border-border text-[10px] font-semibold">
+                  <button
+                    type="button"
+                    onClick={(e) => handleSizeToggle(e, "half")}
+                    className={cn(
+                      "px-2 py-0.5 transition-colors",
+                      size === "half"
+                        ? "bg-maroon text-white"
+                        : "bg-card text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    H
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleSizeToggle(e, "full")}
+                    className={cn(
+                      "px-2 py-0.5 transition-colors",
+                      size === "full"
+                        ? "bg-maroon text-white"
+                        : "bg-card text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    F
+                  </button>
+                </div>
+              </div>
+            ) : item.price !== null ? (
               <span className="font-display text-2xl leading-none text-maroon">
                 ₹{item.price}
               </span>

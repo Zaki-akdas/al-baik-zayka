@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
-import { Leaf, Search, SearchX } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Leaf, Search, SearchX, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import type { MenuItem } from "@/data/menu";
+import { categoryIcons, type MenuItem } from "@/data/menu";
 import { useMenuItems } from "@/lib/menu-source";
 import { cn } from "@/lib/utils";
 import { MenuCard } from "./MenuCard";
@@ -19,6 +19,7 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
   const [category, setCategory] = useState<string>(ALL);
   const [query, setQuery] = useState("");
   const [vegOnly, setVegOnly] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
   const { items, categories, fromDb } = useMenuItems();
 
   const availableItems = fromDb
@@ -37,6 +38,22 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
       return true;
     });
   }, [category, query, vegOnly, availableItems]);
+
+  const handleSearchChange = (value: string) => {
+    setQuery(value);
+    // Auto-switch to "All" so results aren't hidden by a narrow category
+    if (value.trim() && category !== ALL) {
+      setCategory(ALL);
+    }
+  };
+
+  const clearSearch = () => {
+    setQuery("");
+    searchRef.current?.focus();
+  };
+
+  const totalAvailable = availableItems.length;
+  const isFiltering = query.trim() || category !== ALL || vegOnly;
 
   return (
     <section id="menu" className="scroll-mt-20 bg-background py-16 sm:py-24">
@@ -70,7 +87,7 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
                       : "border-border bg-card text-muted-foreground hover:border-maroon/30 hover:text-foreground",
                   )}
                 >
-                  {cat}
+                  {categoryIcons[cat] ? `${categoryIcons[cat]} ${cat}` : cat}
                 </button>
               ))}
             </div>
@@ -80,13 +97,24 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
               <div className="relative flex-1 lg:w-64">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
+                  ref={searchRef}
                   type="search"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   placeholder="Search the menu…"
-                  className="h-10 rounded-full pl-9"
+                  className="h-10 rounded-full pl-9 pr-9"
                   aria-label="Search the menu"
                 />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                  >
+                    <X className="size-4" />
+                  </button>
+                )}
               </div>
               <button
                 type="button"
@@ -104,6 +132,27 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
               </button>
             </div>
           </div>
+
+          {/* Result count when filtering */}
+          {isFiltering && (
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Showing{" "}
+              <span className="font-semibold text-foreground">
+                {filtered.length}
+              </span>{" "}
+              of {totalAvailable} items
+              {query.trim() && (
+                <>
+                  {" "}
+                  for &ldquo;
+                  <span className="font-semibold text-foreground">
+                    {query.trim()}
+                  </span>
+                  &rdquo;
+                </>
+              )}
+            </p>
+          )}
         </Reveal>
 
         {/* Grid */}
@@ -123,6 +172,19 @@ export function MenuSection({ onOpen }: MenuSectionProps) {
               Try a different search, or ask us on WhatsApp — we might have it
               anyway.
             </p>
+            {isFiltering && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setCategory(ALL);
+                  setVegOnly(false);
+                }}
+                className="mt-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Clear all filters
+              </button>
+            )}
           </div>
         )}
 
