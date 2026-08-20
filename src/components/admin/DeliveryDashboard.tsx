@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Phone, Truck, MapPin, CheckCircle2, Clock, Package, Star, Navigation,
+  Phone, Truck, CheckCircle2, Clock, Package, Star, Navigation,
 } from "lucide-react";
 import { toast } from "sonner";
 
