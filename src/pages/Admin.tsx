@@ -82,6 +82,7 @@ import { computeOrderStats } from "@/lib/order-stats";
 import { cn, friendlyErrorMessage } from "@/lib/utils";
 import AnalyticsTab from "@/components/admin/AnalyticsTab";
 import { CategoryManager } from "@/components/admin/CategoryManager";
+import ProductsManager from "@/components/admin/ProductsManager";
 import OffersTab from "@/components/admin/OffersTab";
 import { StarRating } from "@/components/StarRating";
 import { OrderItemClickable } from "@/components/OrderItemDialog";
@@ -900,7 +901,7 @@ function AdminPanel() {
         <div className="mt-6">
           {tab === "orders" && <OrdersTab />}
           {tab === "analytics" && <AnalyticsTab />}
-          {tab === "products" && <ProductsTab />}
+          {tab === "products" && <ProductsManager />}
           {tab === "offers" && <OffersTab />}
           {tab === "categories" && <CategoryManager />}
           {tab === "staff" && <StaffTab />}
