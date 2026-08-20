@@ -298,11 +298,11 @@ const I = {
   vegMaggi: "photo-1585032226651-759b368d7246",
   chickenMaggi: "photo-1569718212165-3a8278d5f624",
   // Snacks & Fries
-  popcorn: "photo-1585735026415-0a44468a6e0c",
+  popcorn: "photo-1573080496219-bb080dd4f877",
   boneless: "photo-1562967914-608f82629710",
   hotWings: "photo-1567620832903-9fc6debc209f",
   lollipop: "photo-1544025162-d76694265947",
-  nuggets: "photo-1562967916-eb82221dfb44",
+  nuggets: "photo-1562967914-608f82629710",
   fries: "photo-1573080496219-bb080dd4f877",
   periFries: "photo-1585109649139-366815a0d713",
   momos: "photo-1529692236671-f1f6cf9683ba",
@@ -312,7 +312,7 @@ const I = {
   cornTaco: "photo-1552332386-f8dd00dc2f85",
   // Loaded
   loaded: "photo-1585109649139-366815a0d713",
-  chickenLoaded: "photo-1630384060421-cb20d0e064b3",
+  chickenLoaded: "photo-1585109649139-366815a0d713",
   // Twister Rolls
   wrap: "photo-1606755962773-d324e0a13086",
   eggWrap: "photo-1626700051175-6818013e1d4f",
@@ -325,13 +325,13 @@ const I = {
   chickenBurger: "photo-1568901346375-23c9450c58cd",
   cheeseBurger: "photo-1550547660-d9450f859349",
   grilledBurger: "photo-1571091718767-18b5b1457add",
-  vegBurger: "photo-1585238342024-78d387f4132e",
+  vegBurger: "photo-1550547660-d9450f859349",
   // Pizza
   chickenPizza: "photo-1513104890138-7c749659a591",
   cheesePizzaImg: "photo-1565299624946-b28f40a0ae38",
   doubleCheesePizza: "photo-1574071318508-1cdbab80d002",
   paneerPizza: "photo-1628840042765-356cda07504e",
-  vegPizza: "photo-1604382355076-af4b0eb61175",
+  vegPizza: "photo-1513104890138-7c749659a591",
   // Chinese (H/F)
   noodles: "photo-1569718212165-3a8278d5f624",
   hakkaNoodles: "photo-1585032226651-759b368d7246",
