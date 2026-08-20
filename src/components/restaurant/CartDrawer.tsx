@@ -147,7 +147,7 @@ export function CartDrawer() {
             <>
               <div className="flex-1 divide-y divide-border overflow-y-auto px-5">
                 {items.map((line) => (
-                  <div key={line.id} className="flex items-center gap-3 py-4">
+                  <div key={line.id} className="flex items-center gap-2 py-3 sm:gap-3 sm:py-4">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{line.name}</p>
                       <p className="text-xs text-muted-foreground">

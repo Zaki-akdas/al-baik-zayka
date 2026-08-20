@@ -69,13 +69,13 @@ export function FoodStory() {
             accent="crave"
           />
           <Reveal delay={0.1}>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base lg:text-lg">
               At Al-Baik Zayka, every bite is about bold flavour, satisfying
               portions and fast food made for real cravings. Whether you're
               grabbing a quick meal or ordering for home, we've got something
               worth coming back for.
             </p>
-            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="mt-6 grid grid-cols-1 gap-2 sm:gap-3 sm:grid-cols-3">
               {trustCards.map((card) => (
                 <div
                   key={card.title}

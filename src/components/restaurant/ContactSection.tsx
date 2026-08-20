@@ -52,7 +52,7 @@ export function ContactSection() {
           subtitle="Call, WhatsApp or drop by — whatever's easiest for you."
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {contactCards.map((card, i) => (
             <Reveal key={card.title} delay={i * 0.07}>
               <a

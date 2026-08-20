@@ -19,7 +19,7 @@ export function FoodPreparation() {
           subtitle="Watch how your order comes together — prepped, sauced and grilled right in front of you."
         />
 
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-5">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 sm:mt-12 lg:grid-cols-5">
           {prepSteps.map((step, i) => (
             <Reveal key={step.id} delay={i * 0.07}>
               <article className="group relative overflow-hidden rounded-3xl border border-border bg-card">

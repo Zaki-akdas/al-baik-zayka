@@ -100,7 +100,7 @@ export function MenuCard({ item, onOpen }: MenuCardProps) {
                 <span className="font-display text-2xl leading-none text-maroon">
                   ₹{activePrice}
                 </span>
-                <div className="ml-1 flex overflow-hidden rounded-full border border-border text-[10px] font-semibold">
+                <div className="ml-1 flex overflow-hidden rounded-full border border-border text-[9px] font-semibold sm:text-[10px]">
                   <button
                     type="button"
                     onClick={(e) => handleSizeToggle(e, "half")}

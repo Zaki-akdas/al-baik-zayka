@@ -63,7 +63,7 @@ export function Hero() {
 
           <motion.h1
             variants={item}
-            className="mt-6 font-display text-6xl uppercase leading-[0.92] tracking-tight text-foreground text-balance sm:text-7xl lg:text-8xl"
+            className="mt-4 font-display text-5xl uppercase leading-[0.92] tracking-tight text-foreground text-balance sm:text-6xl md:text-7xl lg:text-8xl"
           >
             Big Flavour.
             <br />
@@ -91,11 +91,11 @@ export function Hero() {
 
           <motion.div
             variants={item}
-            className="mt-8 flex flex-wrap items-center gap-3"
+            className="mt-6 flex flex-wrap items-center gap-2 sm:gap-3"
           >
             <Button
               size="lg"
-              className="group h-12 px-7 text-base"
+              className="group h-11 px-5 text-sm sm:h-12 sm:px-7 sm:text-base"
               onClick={scrollToMenu}
             >
               Order Now
@@ -104,7 +104,7 @@ export function Hero() {
             <Button
               size="lg"
               variant="outline"
-              className="h-12 bg-white/70 px-7 text-base backdrop-blur-sm"
+              className="h-11 bg-white/70 px-5 text-sm backdrop-blur-sm sm:h-12 sm:px-7 sm:text-base"
               onClick={scrollToMenu}
             >
               View Menu
@@ -113,7 +113,7 @@ export function Hero() {
 
           <motion.div
             variants={item}
-            className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm"
+            className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm"
           >
             <a
               href={telLink}
