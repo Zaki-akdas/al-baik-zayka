@@ -53,6 +53,7 @@ export interface Database {
           category: string;
           description: string;
           price: number;
+          price_half: number | null;
           image: string;
           is_available: boolean;
           is_popular: boolean;
@@ -66,6 +67,7 @@ export interface Database {
           category: string;
           description: string;
           price: number;
+          price_half?: number | null;
           image: string;
           is_available?: boolean;
           is_popular?: boolean;
@@ -78,6 +80,7 @@ export interface Database {
           category?: string;
           description?: string;
           price?: number;
+          price_half?: number | null;
           image?: string;
           is_available?: boolean;
           is_popular?: boolean;

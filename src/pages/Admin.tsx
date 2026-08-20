@@ -439,6 +439,7 @@ interface ProductFormState {
   category: string;
   description: string;
   price: string;
+  priceHalf: string;
   image: string;
   isAvailable: boolean;
   isPopular: boolean;
@@ -451,6 +452,7 @@ const emptyForm: ProductFormState = {
   category: "",
   description: "",
   price: "",
+  priceHalf: "",
   image: "",
   isAvailable: true,
   isPopular: false,
@@ -488,6 +490,7 @@ function ProductsTab() {
       category: p.category,
       description: p.description,
       price: String(p.price),
+      priceHalf: p.price_half != null ? String(p.price_half) : "",
       image: p.image,
       isAvailable: p.is_available,
       isPopular: p.is_popular,
@@ -505,11 +508,13 @@ function ProductsTab() {
         toast("Name, category and a valid price are required");
         return;
       }
+      const priceHalf = form.priceHalf.trim() ? Number(form.priceHalf) : null;
       const payload = {
         name: form.name.trim(),
         category: form.category.trim(),
         description: form.description.trim(),
         price,
+        price_half: priceHalf,
         image: form.image.trim() || fallbackImage,
         is_available: form.isAvailable,
         is_popular: form.isPopular,
@@ -566,6 +571,7 @@ function ProductsTab() {
           category: item.category,
           description: item.description ?? "",
           price: SEED_PRICES[item.id] ?? 99,
+          price_half: item.priceHalf ?? null,
           image: item.image,
           is_available: item.isAvailable ?? true,
           is_popular: item.isPopular ?? false,

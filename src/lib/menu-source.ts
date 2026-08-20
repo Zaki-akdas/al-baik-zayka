@@ -27,6 +27,7 @@ export function useMenu(): MenuItem[] {
     return {
       ...item,
       price: db?.price ?? item.price,
+      priceHalf: db?.price_half != null ? db.price_half : item.priceHalf,
       isAvailable: db?.is_available ?? item.isAvailable,
     };
   });
