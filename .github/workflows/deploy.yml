@@ -1,51 +1,29 @@
-name: Deploy
+name: CI
 
 on:
   push:
     branches: [main]
-  pull_request:
-
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    name: Build & Deploy to Vercel
+  check:
+    name: Typecheck & Test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Run tests
+      - name: Tests
         run: npm test
 
-      - name: Production build
+      - name: Build
         run: npm run build
-
-      - name: Deploy to Vercel (production)
-        if: github.event_name == 'push' && env.VERCEL_TOKEN != ''
-        run: npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
-
-      - name: Deploy to Vercel (preview)
-        if: github.event_name == 'pull_request' && env.VERCEL_TOKEN != ''
-        run: npx vercel deploy --yes --token="$VERCEL_TOKEN"
-
-      - name: Skip deploy (no token)
-        if: env.VERCEL_TOKEN == ''
-        run: echo "::notice::Vercel deploy skipped — add VERCEL_TOKEN secret."
